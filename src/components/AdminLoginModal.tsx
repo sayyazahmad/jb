@@ -137,7 +137,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             onClick={handleFillCredentials}
             className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
           >
-            <span>Auto-fill: <strong>admin</strong> / <strong>Ochor1!</strong></span>
           </button>
         </form>
       </div>
