@@ -1,0 +1,6 @@
+{
+  "name": "Awami Road - Jeeva Morh to Butti",
+  "description": "Community crowdfunding ledger and transparency tracker for village road construction from Jeeva Morh to Butti. Manage offline donations, view donor leaderboard, and track progress.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
