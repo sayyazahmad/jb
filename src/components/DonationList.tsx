@@ -8,7 +8,8 @@ import { formatPKR, formatLakhs, getSourceDetails, exportDonationsToCSV } from '
 
 interface DonationListProps {
   donations: Donation[];
-  onSelectDonation: (donation: Donation) => void;
+  /** Optional: when omitted, cards are not clickable */
+  onSelectDonation?: (donation: Donation) => void;
   isAdmin?: boolean;
   onEditDonation?: (donation: Donation) => void;
   onDeleteDonation?: (donationId: string) => Promise<void> | void;
@@ -285,15 +286,17 @@ export const DonationList: React.FC<DonationListProps> = ({
             return (
               <div
                 key={donation.id}
-                onClick={() => onSelectDonation(donation)}
-                className={`group bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-4.5 border transition-all cursor-pointer relative overflow-hidden active:scale-[0.99] hover:shadow-md ${
+                onClick={onSelectDonation ? () => onSelectDonation(donation) : undefined}
+                className={`group bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-4.5 border transition-all relative overflow-hidden ${
+                  onSelectDonation ? 'cursor-pointer active:scale-[0.99] hover:shadow-md' : ''
+                } ${
                   isTopThree
                     ? rank === 1
                       ? 'border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-400/30 bg-gradient-to-r from-amber-50/40 dark:from-amber-950/40 via-white dark:via-slate-900 to-white dark:to-slate-900'
                       : rank === 2
                       ? 'border-slate-300 dark:border-slate-700 ring-1 ring-slate-300/40 dark:ring-slate-600/40 bg-gradient-to-r from-slate-50/50 dark:from-slate-800/30 via-white dark:via-slate-900 to-white dark:to-slate-900'
                       : 'border-orange-200 dark:border-orange-800/60 ring-1 ring-orange-200/40 dark:ring-orange-800/40 bg-gradient-to-r from-orange-50/30 dark:from-orange-950/40 via-white dark:via-slate-900 to-white dark:to-slate-900'
-                    : 'border-slate-200/90 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700'
+                    : `border-slate-200/90 dark:border-slate-800 ${onSelectDonation ? 'hover:border-emerald-300 dark:hover:border-emerald-700' : ''}`
                 }`}
               >
                 {/* Mobile Top Header: Rank, Badges & Amount */}
@@ -327,7 +330,7 @@ export const DonationList: React.FC<DonationListProps> = ({
                     {/* Donor Details */}
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors truncate">
+                        <h4 className={`text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 transition-colors truncate ${onSelectDonation ? 'group-hover:text-emerald-700 dark:group-hover:text-emerald-400' : ''}`}>
                           {donation.donorName}
                         </h4>
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">

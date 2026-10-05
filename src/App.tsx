@@ -5,12 +5,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { Trophy, ListOrdered } from 'lucide-react';
-import { Donation, RoadMilestone } from './types';
+import { RoadMilestone } from './types';
 import { INITIAL_MILESTONES } from './data/initialData';
 import { Header } from './components/Header';
 import { CampaignStats } from './components/CampaignStats';
 import { DonationList } from './components/DonationList';
-import { ReceiptModal } from './components/ReceiptModal';
 import { VillageLeaderboard } from './components/VillageLeaderboard';
 import { formatPKR } from './utils/formatters';
 import { useDonations, useSettings } from './hooks/useDonations';
@@ -33,9 +32,6 @@ export default function App() {
   const { donations } = useDonations();
   const { settings } = useSettings();
   const [milestones] = useState<RoadMilestone[]>(INITIAL_MILESTONES);
-
-  // Modals state
-  const [selectedDonationForReceipt, setSelectedDonationForReceipt] = useState<Donation | null>(null);
 
   // Active view tab for public navigation
   // 'ledger' = Main donation list (highest on top)
@@ -99,7 +95,6 @@ export default function App() {
         {activeTab === 'ledger' && (
           <DonationList
             donations={visibleDonations}
-            onSelectDonation={(donation) => setSelectedDonationForReceipt(donation)}
           />
         )}
 
@@ -121,13 +116,6 @@ export default function App() {
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <ReceiptModal
-        donation={selectedDonationForReceipt}
-        onClose={() => setSelectedDonationForReceipt(null)}
-        projectName={`${settings.projectName} (${settings.routeDescription})`}
-      />
     </div>
   );
 }
