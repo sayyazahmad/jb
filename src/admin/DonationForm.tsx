@@ -1,40 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  PlusCircle, Save, X, Edit3, Trash2, ShieldCheck, Download, 
-  Upload, RotateCcw, Check, Sparkles, AlertCircle, Wallet, 
+import {
+  Save, Trash2, Check, AlertCircle, Wallet,
   MapPin, Calendar, User, FileText, CheckCircle2,
-  RefreshCw, AlertTriangle, Hash
+  RefreshCw, AlertTriangle, Hash, ArrowLeft
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Donation, PaymentSource, ProjectSettings } from '../types';
-import { formatPKR, getSourceDetails, exportDonationsToCSV } from '../utils/formatters';
+import { Donation, PaymentSource } from '../types';
+import { formatPKR } from '../utils/formatters';
+import { DonationInput } from '../hooks/useDonations';
 
-interface AdminPanelProps {
+interface DonationFormProps {
   donations: Donation[];
-  settings: ProjectSettings;
+  /** Record being edited, or null to add a new donation */
   editingDonation: Donation | null;
-  onSaveDonation: (donation: Omit<Donation, 'id' | 'createdAt'> & { id?: string }) => Promise<void> | void;
+  onSaveDonation: (donation: DonationInput) => Promise<void> | void;
   onDeleteDonation: (id: string) => Promise<void> | void;
-  onCancelEdit: () => void;
-  onUpdateSettings?: (settings: ProjectSettings) => void;
-  onResetData: () => void;
-  onImportData: (data: Donation[]) => void;
-  onCloseAdmin: () => void;
-  isRealtimeActive?: boolean;
+  /** Called when editing is finished (saved, deleted or cancelled) */
+  onDone: () => void;
 }
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({
+export const DonationForm: React.FC<DonationFormProps> = ({
   donations,
-  settings,
   editingDonation,
   onSaveDonation,
   onDeleteDonation,
-  onCancelEdit,
-  onUpdateSettings,
-  onResetData,
-  onImportData,
-  onCloseAdmin,
-  isRealtimeActive
+  onDone
 }) => {
   // Form State
   const [donorName, setDonorName] = useState('');
@@ -48,8 +38,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [receiptNumber, setReceiptNumber] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  // Active Tab: 'form' | 'backup'
-  const [activeTab, setActiveTab] = useState<'form' | 'backup'>('form');
   const [errorMsg, setErrorMsg] = useState('');
   const [successToast, setSuccessToast] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -64,7 +52,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setShowDeleteConfirm(false);
       setSuccessToast('Record deleted from Database successfully!');
       setTimeout(() => setSuccessToast(''), 4000);
-      onCancelEdit();
+      onDone();
     } catch (err: any) {
       setErrorMsg(err?.message || 'Failed to delete record from database.');
     } finally {
@@ -89,7 +77,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setVerifiedBy(editingDonation.verifiedBy || '');
       setReceiptNumber(editingDonation.receiptNumber);
       setIsAnonymous(!!editingDonation.isAnonymous);
-      setActiveTab('form');
     } else {
       // Auto-suggest next sequential receipt number
       const nextNum = 1000 + donations.length + 1;
@@ -189,7 +176,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         const nextNum = 1000 + donations.length + 2;
         setReceiptNumber(`AR-${nextNum}`);
       } else {
-        onCancelEdit();
+        onDone();
       }
     } catch (err: any) {
       setErrorMsg(err?.message || 'Failed to save record into database. Please try again.');
@@ -198,92 +185,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  // Export JSON Backup
-  const handleExportJSON = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(donations, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `awami_road_backup_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  // Import JSON Backup
-  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileReader = new FileReader();
-    if (e.target.files && e.target.files[0]) {
-      fileReader.readAsText(e.target.files[0], 'UTF-8');
-      fileReader.onload = (event) => {
-        try {
-          const parsed = JSON.parse(event.target?.result as string);
-          if (Array.isArray(parsed)) {
-            onImportData(parsed);
-            setSuccessToast(`Successfully restored ${parsed.length} donations!`);
-            setTimeout(() => setSuccessToast(''), 4000);
-          } else {
-            setErrorMsg('Invalid JSON backup file structure.');
-          }
-        } catch (err) {
-          setErrorMsg('Failed to parse backup JSON file.');
-        }
-      };
-    }
-  };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-emerald-600/30 shadow-xl overflow-hidden mb-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white px-5 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-bold">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-base font-bold flex items-center gap-2">
-              <span>Admin Offline Collection Desk</span>
-              <span className="font-urdu text-xs text-amber-300 font-normal">ایڈمن ڈیسک</span>
-            </h3>
-            <p className="text-xs text-emerald-200">
-              Collect donations, issue receipts, and manage village ledger
-            </p>
-          </div>
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      {/* Screen Header */}
+      <div className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={onDone}
+          className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          title="Back to donations list"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="min-w-0">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+            {editingDonation ? `Edit Donation #${editingDonation.receiptNumber}` : 'Add New Donation'}
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-urdu">
+            {editingDonation ? 'عطیہ میں ترمیم' : 'نیا عطیہ درج کریں'}
+          </p>
         </div>
-
-        <button
-          onClick={onCloseAdmin}
-          className="p-1.5 rounded-xl bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 hover:text-white transition-colors"
-          title="Exit Admin Mode"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Admin Navigation Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 pt-2 gap-2 overflow-x-auto scrollbar-none">
-        <button
-          onClick={() => setActiveTab('form')}
-          className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all flex items-center gap-1.5 border-t border-x ${
-            activeTab === 'form'
-              ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-slate-200 dark:border-slate-800 -mb-px'
-              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
-          }`}
-        >
-          <PlusCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <span>{editingDonation ? 'Edit Donation' : 'Record New Donation'}</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('backup')}
-          className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all flex items-center gap-1.5 border-t border-x ${
-            activeTab === 'backup'
-              ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-slate-200 dark:border-slate-800 -mb-px'
-              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
-          }`}
-        >
-          <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <span>Backup & Excel</span>
-        </button>
       </div>
 
       {/* Toast Alert */}
@@ -301,15 +223,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* TAB 1: ADD / EDIT DONATION FORM */}
-      {activeTab === 'form' && (
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
           {editingDonation && (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-center justify-between text-xs text-amber-900 dark:text-amber-200">
               <span>Editing transaction #{editingDonation.receiptNumber} ({editingDonation.donorName})</span>
               <button
                 type="button"
-                onClick={onCancelEdit}
+                onClick={onDone}
                 className="font-bold underline text-amber-950 dark:text-amber-200"
               >
                 Cancel Edit
@@ -671,7 +591,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               {editingDonation && (
                 <button
                   type="button"
-                  onClick={onCancelEdit}
+                  onClick={onDone}
                   className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   Cancel
@@ -698,7 +618,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           </div>
         </form>
-      )}
 
       {/* Delete Confirmation Modal for Editing Record */}
       {showDeleteConfirm && editingDonation && (
@@ -765,95 +684,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <span>Yes, Delete from DB</span>
                   </>
                 )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: BACKUP, EXCEL & RESTORE */}
-      {activeTab === 'backup' && (
-        <div className="p-4 sm:p-6 space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* CSV Excel Card */}
-            <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2">
-              <h4 className="text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
-                <span>Export for Village Notice Board (Excel)</span>
-              </h4>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300">
-                Download a clean spreadsheet containing all {donations.length} transactions, donor names, amounts, and dates.
-              </p>
-              <button
-                type="button"
-                onClick={() => exportDonationsToCSV(donations)}
-                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Excel CSV</span>
-              </button>
-            </div>
-
-            {/* JSON Full Backup */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                <Download className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                <span>Save Offline Backup (JSON)</span>
-              </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Keep a safe backup file on your phone or computer so you never lose village records.
-              </p>
-              <button
-                type="button"
-                onClick={handleExportJSON}
-                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold hover:bg-slate-900 dark:hover:bg-slate-600"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export Data Backup</span>
-              </button>
-            </div>
-
-            {/* Restore from JSON */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                <Upload className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                <span>Restore from Backup File</span>
-              </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Upload a previously saved `.json` file to restore all donations.
-              </p>
-              <label className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
-                <Upload className="w-3.5 h-3.5" />
-                <span>Choose Backup File</span>
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImportJSON}
-                  className="hidden"
-                />
-              </label>
-            </div>
-
-            {/* Reset to Sample Data */}
-            <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2">
-              <h4 className="text-sm font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
-                <RotateCcw className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                <span>Reset to Seed Data</span>
-              </h4>
-              <p className="text-xs text-amber-800 dark:text-amber-300">
-                Re-load the standard Awami Road sample transactions (14 community donations).
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm('Reset all transactions back to default demo donations?')) {
-                    onResetData();
-                  }
-                }}
-                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-700"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset Ledger</span>
               </button>
             </div>
           </div>

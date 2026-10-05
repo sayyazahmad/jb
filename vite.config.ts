@@ -1,11 +1,40 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import {defineConfig, type Plugin} from 'vite';
+
+// Serve admin/index.html for /admin and its client-side routes (e.g. /admin/edit/123) in dev/preview.
+// Production does the same via the rewrite in vercel.json.
+const adminFallback = (): Plugin => {
+  const rewrite = (req: {url?: string}, _res: unknown, next: () => void) => {
+    const pathname = (req.url || '').split('?')[0];
+    if ((pathname === '/admin' || pathname.startsWith('/admin/')) && !path.extname(pathname)) {
+      req.url = '/admin/index.html';
+    }
+    next();
+  };
+  return {
+    name: 'admin-spa-fallback',
+    configureServer(server) {
+      server.middlewares.use(rewrite);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(rewrite);
+    },
+  };
+};
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [adminFallback(), react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          admin: path.resolve(__dirname, 'admin/index.html'),
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

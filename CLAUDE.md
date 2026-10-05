@@ -20,9 +20,9 @@ There is no test suite.
 
 ## Architecture
 
-Single-page React 19 + Vite + Tailwind v4 client app, no backend server (`express`, `@google/genai`, `dotenv` are in deps but unused). `@/` aliases the repo root.
+React 19 + Vite + Tailwind v4 client-only app (public site + admin app), no backend server (`express`, `@google/genai`, `dotenv` are in deps but unused). `@/` aliases the repo root.
 
-**State lives entirely in `src/App.tsx`.** It owns `donations`, `settings`, `isAdmin`, and passes data + callbacks down as props; components don't fetch on their own. There is no router — the public view switches between `ledger` and `villages` tabs via local state.
+**Two apps, one Vite multi-page build.** `index.html` → `src/main.tsx` → `src/App.tsx` is the public site (stats, ledger and villages tabs via local state). `admin/index.html` → `src/admin/main.tsx` → `src/admin/AdminApp.tsx` is the admin app at `/admin`. Both get data from the shared hooks in `src/hooks/useDonations.ts` (`useDonations`, `useSettings`) and pass it down as props; components don't fetch on their own. The admin app uses a tiny history router (`src/admin/router.ts`): `/admin` (list with search/filter/edit/delete + Add New), `/admin/new`, `/admin/edit/:id`, `/admin/backup`. Deep links are rewritten to `admin/index.html` by `vercel.json` in production and the `adminFallback` plugin in `vite.config.ts` in dev.
 
 **Data flow / persistence (layered):**
 1. Seed: `src/data/initialData.ts` provides `INITIAL_DONATIONS` (~200 records), `INITIAL_SETTINGS`, `INITIAL_MILESTONES`.
@@ -31,8 +31,8 @@ Single-page React 19 + Vite + Tailwind v4 client app, no backend server (`expres
 
 Settings (target goal, committee, announcements, admin credentials) are **only** in localStorage — they are not synced to Supabase.
 
-**Admin access** is client-side only: visiting with `?admin`, `?mode=admin`, or `#admin` opens `AdminLoginModal`, which checks against `settings.adminUsername`/`adminPassword` (defaults in `INITIAL_SETTINGS`). Success sets a localStorage flag and renders `AdminPanel` (donation form + backup/import/export/reset tab).
+**Admin access** is client-side only: `AdminApp` shows `AdminLoginModal` until login, checking against `settings.adminUsername`/`adminPassword` (defaults in `INITIAL_SETTINGS`), and stores a localStorage flag. Old `?admin` / `?mode=admin` / `#admin` links on the public site redirect to `/admin/`. Donations flagged `isAnonymous` are shown as "Anonymous" on the public site only (masked in `App.tsx`); the real name is still in the DB and API response.
 
 **Unused code:** `GoogleSheetsSync`, `SupabaseSync`, `RoadGallery`, `AboutProjectModal`, and `CommitteeModal` components are not imported anywhere. The Firebase Google-auth (`services/googleAuth.ts`, config in `firebase-applet-config.json`) and Google Sheets (`services/googleSheets.ts`) services are only reachable through `GoogleSheetsSync`.
 
-`PaymentSource` is a fixed union (`Cash | BankTransfer | Easypesa | Jazzcash` — note the "Easypesa" spelling); parsers fall back to `'Easypesa'` for unknown values. Per-source labels/colors live in `getSourceDetails` in `src/utils/formatters.ts`.
+`PaymentSource` is a fixed union (`Cash | BankTransfer | Easypesa | Jazzcash | Material | Remaining` — note the "Easypesa" spelling; `Remaining` means pledged but not yet received, yet still counts toward totals); parsers fall back to `'Easypesa'` for unknown values. Per-source labels/colors live in `getSourceDetails` in `src/utils/formatters.ts`.

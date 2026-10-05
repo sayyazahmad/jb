@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, LogOut, Monitor, Sun, Moon } from 'lucide-react';
+import { Monitor, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 
 const THEME_OPTIONS = {
@@ -9,14 +9,13 @@ const THEME_OPTIONS = {
 } as const;
 
 interface HeaderProps {
-  isAdmin: boolean;
-  onLogoutAdmin?: () => void;
+  /** Extra buttons shown before the theme toggle (e.g. admin logout) */
+  actions?: React.ReactNode;
+  /** Optional row rendered under the brand bar (e.g. admin navigation) */
+  children?: React.ReactNode;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  isAdmin,
-  onLogoutAdmin
-}) => {
+export const Header: React.FC<HeaderProps> = ({ actions, children }) => {
   const { preference, cyclePreference } = useTheme();
   const theme = THEME_OPTIONS[preference];
   const ThemeIcon = theme.icon;
@@ -51,25 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Only shown if Admin is actively logged in */}
-            {isAdmin && (
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-1 rounded-xl flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Admin Active</span>
-                </span>
-                {onLogoutAdmin && (
-                  <button
-                    onClick={onLogoutAdmin}
-                    title="Exit Admin Mode"
-                    className="px-2.5 py-1 rounded-xl text-xs text-emerald-200 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Logout</span>
-                  </button>
-                )}
-              </div>
-            )}
+            {actions}
 
             {/* Theme toggle: System → Light → Dark */}
             <button
@@ -82,6 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
         </div>
+        {children}
       </div>
     </header>
   );
