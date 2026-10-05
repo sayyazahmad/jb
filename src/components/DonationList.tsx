@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Search, ArrowUpDown, Filter, Award, MapPin, 
   Calendar, Receipt, Share2, Sparkles, Building2, Wallet, 
-  CheckCircle, FileSpreadsheet, Printer, X, Trash2, AlertTriangle, RefreshCw
+  CheckCircle, FileSpreadsheet, Printer, X, Trash2, AlertTriangle, RefreshCw, EyeOff
 } from 'lucide-react';
 import { Donation, PaymentSource } from '../types';
 import { formatPKR, formatLakhs, getSourceDetails, exportDonationsToCSV } from '../utils/formatters';
@@ -333,6 +333,14 @@ export const DonationList: React.FC<DonationListProps> = ({
                         <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors truncate">
                           {donation.donorName}
                         </h4>
+                        {isAdmin && donation.isAnonymous && (
+                          <span
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 inline-flex items-center gap-1"
+                            title="Shown as Anonymous in the public view"
+                          >
+                            <EyeOff className="w-2.5 h-2.5" /> Anonymous
+                          </span>
+                        )}
                         {rank === 1 && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700/60 inline-flex items-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> Highest Contributor

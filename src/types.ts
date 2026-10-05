@@ -9,6 +9,7 @@ export interface Donation {
   date: string; // YYYY-MM-DD
   amount: number; // in PKR / RS
   notes?: string;
+  isAnonymous?: boolean; // Shown as "Anonymous" in the public view; admins see the real name
   verifiedBy?: string;
   receiptNumber: string;
   createdAt: number;

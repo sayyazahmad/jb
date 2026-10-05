@@ -33,6 +33,7 @@ export interface SupabaseDonationRow {
   date: string;
   notes: string | null;
   verified_by: string | null;
+  is_anonymous: boolean;
   created_at: number;
 }
 
@@ -48,6 +49,7 @@ export const toDbRow = (d: Donation): SupabaseDonationRow => ({
   date: d.date,
   notes: d.notes || null,
   verified_by: d.verifiedBy || null,
+  is_anonymous: !!d.isAnonymous,
   created_at: d.createdAt || Date.now()
 });
 
@@ -69,6 +71,7 @@ export const fromDbRow = (row: any): Donation => {
     date: row.date || new Date().toISOString().split('T')[0],
     notes: row.notes || '',
     verifiedBy: row.verified_by || row.verifiedBy || '',
+    isAnonymous: !!(row.is_anonymous ?? row.isAnonymous),
     createdAt: typeof row.created_at === 'number' ? row.created_at : Date.now()
   };
 };
@@ -231,8 +234,12 @@ create table if not exists public.donations (
   date text not null,
   notes text,
   verified_by text,
+  is_anonymous boolean not null default false,
   created_at bigint not null default (extract(epoch from now()) * 1000)::bigint
 );
+
+-- Migration for tables created before the anonymous flag existed
+alter table public.donations add column if not exists is_anonymous boolean not null default false;
 
 -- Enable Row Level Security (RLS)
 alter table public.donations enable row level security;

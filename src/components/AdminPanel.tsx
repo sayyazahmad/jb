@@ -46,6 +46,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [notes, setNotes] = useState('');
   const [verifiedBy, setVerifiedBy] = useState('Tanveer Wilayat');
   const [receiptNumber, setReceiptNumber] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   // Active Tab: 'form' | 'backup'
   const [activeTab, setActiveTab] = useState<'form' | 'backup'>('form');
@@ -87,6 +88,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       setNotes(editingDonation.notes || '');
       setVerifiedBy(editingDonation.verifiedBy || '');
       setReceiptNumber(editingDonation.receiptNumber);
+      setIsAnonymous(!!editingDonation.isAnonymous);
       setActiveTab('form');
     } else {
       // Auto-suggest next sequential receipt number
@@ -150,7 +152,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       amount: parsedAmount,
       notes: notes.trim(),
       verifiedBy: verifiedBy.trim(),
-      receiptNumber: finalReceipt
+      receiptNumber: finalReceipt,
+      isAnonymous
     };
 
     setIsSaving(true);
@@ -182,6 +185,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         setAmount('');
         setReference('');
         setNotes('');
+        setIsAnonymous(false);
         const nextNum = 1000 + donations.length + 2;
         setReceiptNumber(`AR-${nextNum}`);
       } else {
@@ -375,6 +379,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 placeholder="e.g. Haji Ghulam Murtaza, Chaudhry Riaz..."
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
+
+              {/* Anonymous toggle: real name is kept for admins, public sees "Anonymous" */}
+              <label className="flex items-start gap-2 pt-1 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-emerald-600 cursor-pointer"
+                />
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  <strong className="text-slate-800 dark:text-slate-200">Show as Anonymous</strong>
+                  <span className="font-urdu ml-1">(گمنام)</span>
+                  <span className="block text-[11px] text-slate-400 dark:text-slate-500">
+                    Public ledger shows "Anonymous"; admins still see the real name.
+                  </span>
+                </span>
+              </label>
             </div>
 
             {/* Village Name */}

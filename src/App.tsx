@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Trophy, MapPin, Plus, ShieldCheck, HeartHandshake, 
   HelpCircle, PhoneCall, ListOrdered, Building, Camera, 
@@ -250,6 +250,13 @@ export default function App() {
 
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
 
+  // Public visitors see "Anonymous" for donors who asked to hide their name; admins see real names.
+  // Masking here covers the list, search, receipts, WhatsApp text and CSV export in one place.
+  const visibleDonations = useMemo(
+    () => (isAdmin ? donations : donations.map(d => (d.isAnonymous ? { ...d, donorName: 'Anonymous' } : d))),
+    [donations, isAdmin]
+  );
+
   return (
     <div className="min-h-screen bg-slate-100/70 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12">
       {/* Top Header */}
@@ -318,7 +325,7 @@ export default function App() {
         {/* Tab Content */}
         {activeTab === 'ledger' && (
           <DonationList
-            donations={donations}
+            donations={visibleDonations}
             onSelectDonation={(donation) => setSelectedDonationForReceipt(donation)}
             isAdmin={isAdmin}
             onEditDonation={(donation) => {
@@ -334,7 +341,7 @@ export default function App() {
 
         {activeTab === 'villages' && (
           <VillageLeaderboard
-            donations={donations}
+            donations={visibleDonations}
             onSelectVillage={() => setActiveTab('ledger')}
           />
         )}
