@@ -74,7 +74,6 @@ export const syncAllDonationsToSheet = async (
 ): Promise<SheetSyncResult> => {
   const headers = [
     'SR #',
-    'Receipt Number',
     'Date',
     'Donor Name',
     'Village Name',
@@ -88,7 +87,6 @@ export const syncAllDonationsToSheet = async (
   // Map donations to rows
   const rows = donations.map((d, idx) => [
     idx + 1,
-    d.receiptNumber || `AR-${idx + 1}`,
     d.date,
     d.donorName,
     d.villageName,
@@ -103,7 +101,7 @@ export const syncAllDonationsToSheet = async (
 
   // 1. Clear existing contents to prevent stale rows
   await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A1:J${Math.max(5000, donations.length + 100)}:clear`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A1:I${Math.max(5000, donations.length + 100)}:clear`,
     {
       method: 'POST',
       headers: {
@@ -152,7 +150,7 @@ export const syncAllDonationsToSheet = async (
                 startRowIndex: 0,
                 endRowIndex: 1,
                 startColumnIndex: 0,
-                endColumnIndex: 10
+                endColumnIndex: 9
               },
               cell: {
                 userEnteredFormat: {
@@ -195,7 +193,6 @@ export const appendSingleDonationToSheet = async (
 ): Promise<boolean> => {
   const row = [
     srNumber,
-    donation.receiptNumber,
     donation.date,
     donation.donorName,
     donation.villageName,
@@ -207,7 +204,7 @@ export const appendSingleDonationToSheet = async (
   ];
 
   const res = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A:J:append?valueInputOption=USER_ENTERED`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A:I:append?valueInputOption=USER_ENTERED`,
     {
       method: 'POST',
       headers: {
@@ -215,7 +212,7 @@ export const appendSingleDonationToSheet = async (
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        range: 'Donations!A:J',
+        range: 'Donations!A:I',
         majorDimension: 'ROWS',
         values: [row]
       })
@@ -233,7 +230,7 @@ export const fetchDonationsFromSheet = async (
   spreadsheetId: string
 ): Promise<Donation[]> => {
   const res = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A2:J5000`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Donations!A2:I5000`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -250,17 +247,16 @@ export const fetchDonationsFromSheet = async (
   const rows: any[][] = data.values || [];
 
   return rows.map((row, idx) => {
-    const receiptNumber = row[1] || `AR-${idx + 1}`;
-    const date = row[2] || new Date().toISOString().split('T')[0];
-    const donorName = row[3] || 'Anonymous';
-    const villageName = row[4] || 'Khushi Kot';
-    const amount = parseInt(String(row[5]).replace(/[^0-9]/g, ''), 10) || 0;
-    const source: PaymentSource = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash'].includes(row[6])
-      ? (row[6] as PaymentSource)
+    const date = row[1] || new Date().toISOString().split('T')[0];
+    const donorName = row[2] || 'Anonymous';
+    const villageName = row[3] || 'Khushi Kot';
+    const amount = parseInt(String(row[4]).replace(/[^0-9]/g, ''), 10) || 0;
+    const source: PaymentSource = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash', 'Material', 'Remaining'].includes(row[5])
+      ? (row[5] as PaymentSource)
       : 'Easypesa';
-    const reference = row[7] || '';
-    const notes = row[8] || '';
-    const verifiedBy = row[9] || '';
+    const reference = row[6] || '';
+    const notes = row[7] || '';
+    const verifiedBy = row[8] || '';
 
     return {
       id: `sheet-don-${idx + 1}-${Date.now()}`,
@@ -272,7 +268,6 @@ export const fetchDonationsFromSheet = async (
       amount,
       notes,
       verifiedBy,
-      receiptNumber,
       createdAt: new Date(date).getTime() || Date.now()
     };
   });

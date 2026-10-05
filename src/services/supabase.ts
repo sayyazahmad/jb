@@ -24,7 +24,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 export interface SupabaseDonationRow {
   id: string;
-  receipt_number: string;
   donor_name: string;
   village_name: string;
   amount: number;
@@ -33,6 +32,7 @@ export interface SupabaseDonationRow {
   date: string;
   notes: string | null;
   verified_by: string | null;
+  referred_by: string | null;
   is_anonymous: boolean;
   created_at: number;
 }
@@ -40,7 +40,6 @@ export interface SupabaseDonationRow {
 // Convert frontend Donation to Supabase DB Row
 export const toDbRow = (d: Donation): SupabaseDonationRow => ({
   id: d.id,
-  receipt_number: d.receiptNumber,
   donor_name: d.donorName,
   village_name: d.villageName,
   amount: d.amount,
@@ -49,6 +48,7 @@ export const toDbRow = (d: Donation): SupabaseDonationRow => ({
   date: d.date,
   notes: d.notes || null,
   verified_by: d.verifiedBy || null,
+  referred_by: d.referredBy || null,
   is_anonymous: !!d.isAnonymous,
   created_at: d.createdAt || Date.now()
 });
@@ -62,7 +62,6 @@ export const fromDbRow = (row: any): Donation => {
 
   return {
     id: String(row.id),
-    receiptNumber: row.receipt_number || row.receiptNumber || 'AR-0',
     donorName: row.donor_name || row.donorName || 'Anonymous',
     villageName: row.village_name || row.villageName || 'Khushi Kot',
     amount: Number(row.amount) || 0,
@@ -71,6 +70,7 @@ export const fromDbRow = (row: any): Donation => {
     date: row.date || new Date().toISOString().split('T')[0],
     notes: row.notes || '',
     verifiedBy: row.verified_by || row.verifiedBy || '',
+    referredBy: row.referred_by || row.referredBy || '',
     isAnonymous: !!(row.is_anonymous ?? row.isAnonymous),
     createdAt: typeof row.created_at === 'number' ? row.created_at : Date.now()
   };
@@ -158,7 +158,7 @@ export const deleteDonationFromSupabase = async (id: string): Promise<void> => {
 };
 
 /**
- * Batch upload / seed all donations to Supabase (chunks of 50 for safety)
+ * Batch upload donations to Supabase (chunks of 50 for safety)
  */
 export const batchUploadDonationsToSupabase = async (
   donations: Donation[],
@@ -225,7 +225,6 @@ export const SUPABASE_SQL_SETUP = `-- Run this in your Supabase SQL Editor (http
 
 create table if not exists public.donations (
   id text primary key,
-  receipt_number text not null,
   donor_name text not null,
   village_name text not null,
   amount bigint not null,
@@ -234,12 +233,15 @@ create table if not exists public.donations (
   date text not null,
   notes text,
   verified_by text,
+  referred_by text,
   is_anonymous boolean not null default false,
   created_at bigint not null default (extract(epoch from now()) * 1000)::bigint
 );
 
 -- Migration for tables created before the anonymous flag existed
 alter table public.donations add column if not exists is_anonymous boolean not null default false;
+alter table public.donations add column if not exists referred_by text;
+alter table public.donations drop column if exists receipt_number;
 
 -- Enable Row Level Security (RLS)
 alter table public.donations enable row level security;

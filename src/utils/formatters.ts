@@ -105,7 +105,6 @@ export function generateWhatsAppReceiptText(donation: Donation, projectName: str
   return `*${projectName.toUpperCase()} (Jeeva Morh to Butti)*%0A` +
     `*عوامی سڑک فنڈ - آفیشل رسید*%0A` +
     `--------------------------------%0A` +
-    `*Receipt #:* ${donation.receiptNumber}%0A` +
     `*Donor Name:* ${donation.donorName}%0A` +
     `*Village:* ${donation.villageName}%0A` +
     `*Amount:* ${formatPKR(donation.amount)}%0A` +
@@ -120,10 +119,9 @@ export function generateWhatsAppReceiptText(donation: Donation, projectName: str
 export function exportDonationsToCSV(donations: Donation[], filename: string = 'awami_road_donations.csv'): void {
   // Add UTF-8 BOM so Excel opens Urdu and special characters cleanly
   const BOM = '\uFEFF';
-  const headers = ['Receipt #', 'Donor Name', 'Village', 'Amount (PKR)', 'Payment Source', 'Reference', 'Date', 'Received / Verified By', 'Notes'];
+  const headers = ['Donor Name', 'Village', 'Amount (PKR)', 'Payment Source', 'Reference', 'Date', 'Received / Verified By', 'Notes'];
   
   const rows = donations.map((d) => [
-    `"${d.receiptNumber}"`,
     `"${d.donorName.replace(/"/g, '""')}"`,
     `"${d.villageName.replace(/"/g, '""')}"`,
     d.amount,

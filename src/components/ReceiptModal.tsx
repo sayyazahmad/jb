@@ -71,9 +71,6 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 Village Community Infrastructure & Road Development Fund
               </p>
-              <div className="inline-block mt-1 px-3 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 text-[11px] font-bold">
-                Receipt #{donation.receiptNumber}
-              </div>
             </div>
 
             {/* Receipt Meta */}

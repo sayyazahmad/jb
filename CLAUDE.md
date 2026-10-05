@@ -14,7 +14,6 @@ Package manager is Bun (`bun.lock`); npm also works.
 - `bun run dev` — Vite dev server on port 3000, bound to 0.0.0.0
 - `bun run build` / `bun run preview`
 - `bun run lint` — type-check only (`tsc --noEmit`); there is no ESLint
-- `bunx tsx scripts/seed-supabase.ts` — upsert `INITIAL_DONATIONS` into the Supabase `donations` table
 
 There is no test suite.
 
@@ -22,12 +21,12 @@ There is no test suite.
 
 React 19 + Vite + Tailwind v4 client-only app (public site + admin app), no backend server (`express`, `@google/genai`, `dotenv` are in deps but unused). `@/` aliases the repo root.
 
-**Two apps, one Vite multi-page build.** `index.html` → `src/main.tsx` → `src/App.tsx` is the public site (stats, ledger and villages tabs via local state). `admin/index.html` → `src/admin/main.tsx` → `src/admin/AdminApp.tsx` is the admin app at `/admin`. Both get data from the shared hooks in `src/hooks/useDonations.ts` (`useDonations`, `useSettings`) and pass it down as props; components don't fetch on their own. The admin app uses a tiny history router (`src/admin/router.ts`): `/admin` (list with search/filter/edit/delete + Add New), `/admin/new`, `/admin/edit/:id`, `/admin/backup`. Deep links are rewritten to `admin/index.html` by `vercel.json` in production and the `adminFallback` plugin in `vite.config.ts` in dev.
+**Two apps, one Vite multi-page build.** `index.html` → `src/main.tsx` → `src/App.tsx` is the public site (stats, ledger and villages tabs via local state). `admin/index.html` → `src/admin/main.tsx` → `src/admin/AdminApp.tsx` is the admin app at `/admin`. Both get data from the shared hooks in `src/hooks/useDonations.ts` (`useDonations`, `useSettings`) and pass it down as props; components don't fetch on their own. The admin app uses a tiny history router (`src/admin/router.ts`): `/admin` (`DonationGrid`: search/filter/sort/edit, Excel/PDF export via `src/admin/exports.ts`, Add New), `/admin/new`, `/admin/edit/:id`, `/admin/backup`. Deep links are rewritten to `admin/index.html` by `vercel.json` in production and the `adminFallback` plugin in `vite.config.ts` in dev.
 
 **Data flow / persistence (layered):**
-1. Seed: `src/data/initialData.ts` provides `INITIAL_DONATIONS` (~200 records), `INITIAL_SETTINGS`, `INITIAL_MILESTONES`.
-2. localStorage cache: donations/settings/admin flag under keys suffixed `_v3`/`_v2`. On load, cached donations are only used if there are at least as many as the seed — bump the key version when changing the seed shape.
-3. Supabase (`src/services/supabase.ts`) is the source of truth: on mount App fetches all rows (replacing local state if non-empty) and subscribes to realtime INSERT/UPDATE/DELETE. Saves are optimistic local updates followed by `upsert`. `toDbRow`/`fromDbRow` map camelCase `Donation` ↔ snake_case columns; the table schema and (fully public) RLS policies are in the `SUPABASE_SQL_SETUP` string in that file. Credentials come from `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` with hardcoded fallbacks.
+1. No seed data: donations start empty. `src/data/initialData.ts` only holds `INITIAL_SETTINGS` and `INITIAL_MILESTONES`.
+2. localStorage cache: donations (`awami_road_donations_v4`; the old `_v3` key that held seed data is deleted on load), settings (`_v3`) and the admin flag (`_v2`). The cache is only a fallback for when Supabase is unreachable.
+3. Supabase (`src/services/supabase.ts`) is the source of truth: on mount `useDonations` fetches all rows and always replaces local state (even with an empty list) and subscribes to realtime INSERT/UPDATE/DELETE. Saves are optimistic local updates followed by `upsert`. `toDbRow`/`fromDbRow` map camelCase `Donation` ↔ snake_case columns; the table schema and (fully public) RLS policies are in the `SUPABASE_SQL_SETUP` string in that file. Credentials come from `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` with hardcoded fallbacks.
 
 Settings (target goal, committee, announcements, admin credentials) are **only** in localStorage — they are not synced to Supabase.
 

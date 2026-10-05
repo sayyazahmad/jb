@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Donation, ProjectSettings } from '../types';
-import { INITIAL_DONATIONS, INITIAL_SETTINGS } from '../data/initialData';
+import { INITIAL_SETTINGS } from '../data/initialData';
 import {
   saveDonationToSupabase,
   deleteDonationFromSupabase,
@@ -9,7 +9,9 @@ import {
   supabase
 } from '../services/supabase';
 
-const STORAGE_KEY_DONATIONS = 'awami_road_donations_v3';
+// v4: no seed data any more; older caches may still hold the old seed records, so they're ignored and removed
+const STORAGE_KEY_DONATIONS = 'awami_road_donations_v4';
+const LEGACY_DONATION_KEYS = ['awami_road_donations_v3'];
 const STORAGE_KEY_SETTINGS = 'awami_road_settings_v3';
 
 export type DonationInput = Omit<Donation, 'id' | 'createdAt'> & { id?: string };
@@ -19,18 +21,19 @@ export type DonationInput = Omit<Donation, 'id' | 'createdAt'> & { id?: string }
  * localStorage cache + Supabase load + realtime sync + optimistic save/delete.
  */
 export const useDonations = () => {
-  // Load persistent state or initial seed (v3 has expanded 200 records)
+  // Start from the local cache of the last Supabase load (no seed data); Supabase replaces it on mount
   const [donations, setDonations] = useState<Donation[]>(() => {
     try {
+      LEGACY_DONATION_KEYS.forEach(key => localStorage.removeItem(key));
       const saved = localStorage.getItem(STORAGE_KEY_DONATIONS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= INITIAL_DONATIONS.length) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.error('Failed to load local storage donations', e);
     }
-    return INITIAL_DONATIONS;
+    return [];
   });
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
   // True once the initial Supabase fetch has finished (successfully or not)
@@ -47,15 +50,13 @@ export const useDonations = () => {
 
   // Initialize Supabase realtime sync and remote load
   useEffect(() => {
-    // 1. Fetch live records from Supabase if table populated
+    // 1. Fetch live records from Supabase (the source of truth, even when empty)
     fetchDonationsFromSupabase()
       .then(remoteDonations => {
-        if (remoteDonations && remoteDonations.length > 0) {
-          setDonations(remoteDonations);
-        }
+        setDonations(remoteDonations || []);
       })
       .catch(err => {
-        // Table not created or network issue - fallback gracefully to local seed
+        // Table not created or network issue - keep whatever the local cache had
         console.warn('Initial Supabase fetch skipped:', err.message);
       })
       .finally(() => setIsLoaded(true));

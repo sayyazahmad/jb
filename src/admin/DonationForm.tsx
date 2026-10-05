@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Save, Trash2, Check, AlertCircle, Wallet,
   MapPin, Calendar, User, FileText, CheckCircle2,
-  RefreshCw, AlertTriangle, Hash, ArrowLeft
+  RefreshCw, AlertTriangle, ArrowLeft, UserCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Donation, PaymentSource } from '../types';
@@ -10,7 +10,6 @@ import { formatPKR } from '../utils/formatters';
 import { DonationInput } from '../hooks/useDonations';
 
 interface DonationFormProps {
-  donations: Donation[];
   /** Record being edited, or null to add a new donation */
   editingDonation: Donation | null;
   onSaveDonation: (donation: DonationInput) => Promise<void> | void;
@@ -20,7 +19,6 @@ interface DonationFormProps {
 }
 
 export const DonationForm: React.FC<DonationFormProps> = ({
-  donations,
   editingDonation,
   onSaveDonation,
   onDeleteDonation,
@@ -35,8 +33,8 @@ export const DonationForm: React.FC<DonationFormProps> = ({
   const [amount, setAmount] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [verifiedBy, setVerifiedBy] = useState('Tanveer Wilayat');
-  const [receiptNumber, setReceiptNumber] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [referredBy, setReferredBy] = useState('');
 
   const [errorMsg, setErrorMsg] = useState('');
   const [successToast, setSuccessToast] = useState('');
@@ -75,14 +73,10 @@ export const DonationForm: React.FC<DonationFormProps> = ({
       setAmount(editingDonation.amount.toString());
       setNotes(editingDonation.notes || '');
       setVerifiedBy(editingDonation.verifiedBy || '');
-      setReceiptNumber(editingDonation.receiptNumber);
       setIsAnonymous(!!editingDonation.isAnonymous);
-    } else {
-      // Auto-suggest next sequential receipt number
-      const nextNum = 1000 + donations.length + 1;
-      setReceiptNumber(`AR-${nextNum}`);
+      setReferredBy(editingDonation.referredBy || '');
     }
-  }, [editingDonation, donations.length]);
+  }, [editingDonation]);
 
   const handleAddQuickAmount = (val: number) => {
     const current = parseInt(amount, 10) || 0;
@@ -128,7 +122,6 @@ export const DonationForm: React.FC<DonationFormProps> = ({
       return;
     }
 
-    const finalReceipt = receiptNumber.trim() || `AR-${1000 + donations.length + 1}`;
     const savedDonation = {
       id: editingDonation ? editingDonation.id : undefined,
       donorName: donorName.trim(),
@@ -139,7 +132,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
       amount: parsedAmount,
       notes: notes.trim(),
       verifiedBy: verifiedBy.trim(),
-      receiptNumber: finalReceipt,
+      referredBy: referredBy.trim(),
       isAnonymous
     };
 
@@ -173,8 +166,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
         setReference('');
         setNotes('');
         setIsAnonymous(false);
-        const nextNum = 1000 + donations.length + 2;
-        setReceiptNumber(`AR-${nextNum}`);
+        setReferredBy('');
       } else {
         onDone();
       }
@@ -200,7 +192,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
         </button>
         <div className="min-w-0">
           <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
-            {editingDonation ? `Edit Donation #${editingDonation.receiptNumber}` : 'Add New Donation'}
+            {editingDonation ? 'Edit Donation' : 'Add New Donation'}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-urdu">
             {editingDonation ? 'عطیہ میں ترمیم' : 'نیا عطیہ درج کریں'}
@@ -226,7 +218,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
           {editingDonation && (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-center justify-between text-xs text-amber-900 dark:text-amber-200">
-              <span>Editing transaction #{editingDonation.receiptNumber} ({editingDonation.donorName})</span>
+              <span>Editing donation from <strong>{editingDonation.donorName}</strong></span>
               <button
                 type="button"
                 onClick={onDone}
@@ -486,13 +478,29 @@ export const DonationForm: React.FC<DonationFormProps> = ({
             </div>
           </div>
 
-          {/* Reference, Date & Receipt # Grid */}
+          {/* Reference Person, Transaction ID & Date Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {/* Reference person (admin only) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <UserCheck className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                <span>Reference (حوالہ)</span>
+              </label>
+              <input
+                type="text"
+                value={referredBy}
+                onChange={(e) => setReferredBy(e.target.value)}
+                placeholder="Person the donation came through"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              />
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">Admin only — not shown on the public site.</p>
+            </div>
+
             {/* Reference */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                 <FileText className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                <span>Reference / TRX ID / Note</span>
+                <span>Transaction ID / Note</span>
               </label>
               <input
                 type="text"
@@ -515,21 +523,6 @@ export const DonationForm: React.FC<DonationFormProps> = ({
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-              />
-            </div>
-
-            {/* Receipt Number */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                <Hash className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                <span>Receipt # (رسید نمبر)</span>
-              </label>
-              <input
-                type="text"
-                value={receiptNumber}
-                onChange={(e) => setReceiptNumber(e.target.value)}
-                placeholder="AR-1001"
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -647,10 +640,6 @@ export const DonationForm: React.FC<DonationFormProps> = ({
                 <span className="font-extrabold text-rose-700 dark:text-rose-400 text-sm">
                   {formatPKR(editingDonation.amount)}
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Receipt #:</span>
-                <span className="font-mono text-slate-700 dark:text-slate-300">{editingDonation.receiptNumber}</span>
               </div>
             </div>
 

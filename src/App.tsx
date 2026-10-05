@@ -44,10 +44,11 @@ export default function App() {
 
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
 
-  // Donors who asked to hide their name are shown as "Anonymous" (admins see real names in /admin).
-  // Masking here covers the list, search, receipts, WhatsApp text and CSV export in one place.
+  // Public view: donors who asked to hide their name are shown as "Anonymous" (admins see real names in /admin),
+  // and the admin-only reference person is dropped. Doing it here covers the list, search, receipts,
+  // WhatsApp text and CSV export in one place.
   const visibleDonations = useMemo(
-    () => donations.map(d => (d.isAnonymous ? { ...d, donorName: 'Anonymous' } : d)),
+    () => donations.map(({ referredBy: _adminOnly, ...d }) => (d.isAnonymous ? { ...d, donorName: 'Anonymous' } : d)),
     [donations]
   );
 

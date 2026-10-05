@@ -104,7 +104,7 @@ export const SupabaseSync: React.FC<SupabaseSyncProps> = ({
       if (rows.length === 0) {
         setToast({
           type: 'info',
-          text: 'The Supabase donations table is currently empty. Use "Push All" to seed it.'
+          text: 'The Supabase donations table is currently empty. Use "Push All" to upload local records.'
         });
       } else {
         onImportDonations(rows);

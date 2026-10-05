@@ -11,7 +11,7 @@ export interface Donation {
   notes?: string;
   isAnonymous?: boolean; // Shown as "Anonymous" in the public view; admins see the real name
   verifiedBy?: string;
-  receiptNumber: string;
+  referredBy?: string; // Person the donation came through — admin only, never shown publicly
   createdAt: number;
 }
 

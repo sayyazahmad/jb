@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Download, Upload, RotateCcw, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Download, Upload, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Donation } from '../types';
 import { exportDonationsToCSV } from '../utils/formatters';
 
 interface BackupPanelProps {
   donations: Donation[];
   onImportData: (data: Donation[]) => void;
-  onResetData: () => void;
 }
 
-export const BackupPanel: React.FC<BackupPanelProps> = ({ donations, onImportData, onResetData }) => {
+export const BackupPanel: React.FC<BackupPanelProps> = ({ donations, onImportData }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successToast, setSuccessToast] = useState('');
 
@@ -126,29 +125,6 @@ export const BackupPanel: React.FC<BackupPanelProps> = ({ donations, onImportDat
                   className="hidden"
                 />
               </label>
-            </div>
-
-            {/* Reset to Sample Data */}
-            <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2">
-              <h4 className="text-sm font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
-                <RotateCcw className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                <span>Reset to Seed Data</span>
-              </h4>
-              <p className="text-xs text-amber-800 dark:text-amber-300">
-                Re-load the standard Awami Road sample transactions (14 community donations).
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm('Reset all transactions back to default demo donations?')) {
-                    onResetData();
-                  }
-                }}
-                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-700"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset Ledger</span>
-              </button>
             </div>
           </div>
         </div>
