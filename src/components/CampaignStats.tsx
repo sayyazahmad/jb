@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, TrendingUp, Award, Sparkles, HeartHandshake } from 'lucide-react';
+import { Users, TrendingUp, Award, Sparkles, HeartHandshake, Target } from 'lucide-react';
 import { Donation, ProjectSettings, RoadMilestone } from '../types';
 import { formatPKR, formatLakhs } from '../utils/formatters';
 
@@ -11,9 +11,13 @@ interface CampaignStatsProps {
 }
 
 export const CampaignStats: React.FC<CampaignStatsProps> = ({
-  donations
+  donations,
+  settings
 }) => {
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
+  const targetGoal = settings.targetGoal;
+  const progressPct = targetGoal > 0 ? (totalRaised / targetGoal) * 100 : 0;
+  const remainingToGoal = Math.max(targetGoal - totalRaised, 0);
   const donorCount = donations.length;
   const maxDonation = donations.length > 0 ? Math.max(...donations.map(d => d.amount)) : 0;
   const avgDonation = donations.length > 0 ? Math.round(totalRaised / donations.length) : 0;
@@ -48,7 +52,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
           {/* Main Total Display */}
           <div className="space-y-1">
             <span className="text-xs sm:text-sm font-medium uppercase tracking-wider text-emerald-200/90 block">
-              Total Offline Donations Collected / کل جمع شدہ رقم
+              Total Donations Collected / کل جمع شدہ رقم
             </span>
             <div className="flex items-baseline gap-2.5 flex-wrap">
               <span className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">
@@ -59,6 +63,45 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
               </span>
             </div>
           </div>
+
+          {/* Target Progress Bar */}
+          {targetGoal > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-end justify-between gap-2 text-xs sm:text-sm">
+                <span className="text-emerald-200 font-medium flex items-center gap-1.5">
+                  <Target className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Target / ہدف: <strong className="text-white">{formatPKR(targetGoal)}</strong></span>
+                  <span className="text-emerald-300/80 hidden sm:inline">({formatLakhs(targetGoal)})</span>
+                </span>
+                <span className="font-extrabold text-amber-300 text-sm sm:text-base">
+                  {progressPct.toFixed(1)}%
+                </span>
+              </div>
+              <div
+                className="h-3 sm:h-3.5 w-full rounded-full bg-emerald-950/70 border border-emerald-700/50 overflow-hidden"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={targetGoal}
+                aria-valuenow={totalRaised}
+                aria-label="Progress towards target"
+              >
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-400 transition-[width] duration-700"
+                  style={{ width: `${Math.min(progressPct, 100)}%` }}
+                />
+              </div>
+              <div className="text-[11px] sm:text-xs text-emerald-200/90">
+                {remainingToGoal > 0 ? (
+                  <span>
+                    <strong className="text-white">{formatPKR(remainingToGoal)}</strong> more needed to reach the target
+                    <span className="font-urdu ml-1">/ ہدف تک باقی رقم</span>
+                  </span>
+                ) : (
+                  <span className="text-amber-300 font-semibold">🎉 Target reached! / ہدف مکمل</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Sub Stats Grid */}
           <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 pt-1">

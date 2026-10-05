@@ -1,4 +1,4 @@
-export type PaymentSource = 'Cash' | 'BankTransfer' | 'Easypesa' | 'Jazzcash';
+export type PaymentSource = 'Cash' | 'BankTransfer' | 'Easypesa' | 'Jazzcash' | 'Material' | 'Remaining';
 
 export interface Donation {
   id: string;

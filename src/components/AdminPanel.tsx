@@ -228,7 +228,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl border-2 border-emerald-600/30 shadow-xl overflow-hidden mb-6">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-emerald-600/30 shadow-xl overflow-hidden mb-6">
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white px-5 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -256,16 +256,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       </div>
 
       {/* Admin Navigation Tabs */}
-      <div className="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 pt-2 gap-2 overflow-x-auto scrollbar-none">
         <button
           onClick={() => setActiveTab('form')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all flex items-center gap-1.5 border-t border-x ${
             activeTab === 'form'
-              ? 'bg-white text-emerald-800 border-slate-200 -mb-px'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-slate-200 dark:border-slate-800 -mb-px'
+              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
           }`}
         >
-          <PlusCircle className="w-4 h-4 text-emerald-600" />
+          <PlusCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>{editingDonation ? 'Edit Donation' : 'Record New Donation'}</span>
         </button>
 
@@ -273,26 +273,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           onClick={() => setActiveTab('backup')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all flex items-center gap-1.5 border-t border-x ${
             activeTab === 'backup'
-              ? 'bg-white text-emerald-800 border-slate-200 -mb-px'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-slate-200 dark:border-slate-800 -mb-px'
+              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
           }`}
         >
-          <Download className="w-4 h-4 text-emerald-600" />
+          <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Backup & Excel</span>
         </button>
       </div>
 
       {/* Toast Alert */}
       {successToast && (
-        <div className="m-4 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs sm:text-sm text-emerald-800 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+        <div className="m-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 rounded-xl text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="m-4 p-3 bg-rose-50 border border-rose-300 rounded-xl text-xs sm:text-sm text-rose-800 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+        <div className="m-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-700/60 rounded-xl text-xs sm:text-sm text-rose-800 dark:text-rose-300 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
@@ -301,12 +301,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {activeTab === 'form' && (
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
           {editingDonation && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-900">
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-center justify-between text-xs text-amber-900 dark:text-amber-200">
               <span>Editing transaction #{editingDonation.receiptNumber} ({editingDonation.donorName})</span>
               <button
                 type="button"
                 onClick={onCancelEdit}
-                className="font-bold underline text-amber-950"
+                className="font-bold underline text-amber-950 dark:text-amber-200"
               >
                 Cancel Edit
               </button>
@@ -314,21 +314,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           )}
 
           {/* Amount Box (Prominent for fast phone entry) */}
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 sm:p-5 rounded-2xl border border-emerald-200 space-y-2.5">
+          <div className="bg-gradient-to-r from-emerald-50 dark:from-emerald-950/40 to-teal-50 dark:to-teal-950/40 p-4 sm:p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs sm:text-sm font-bold text-emerald-900 flex items-center gap-1.5">
+              <label className="text-xs sm:text-sm font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
                 <span className="text-base">💰</span>
                 <span>Donation Amount in RS (رقم عطیہ) *</span>
               </label>
               {amount && !isNaN(parseInt(amount)) && (
-                <span className="text-xs font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
                   {formatPKR(parseInt(amount))}
                 </span>
               )}
             </div>
 
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-extrabold text-slate-500 text-sm">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-extrabold text-slate-500 dark:text-slate-400 text-sm">
                 RS.
               </span>
               <input
@@ -339,19 +339,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="e.g. 50000"
-                className="w-full pl-12 pr-4 py-3 bg-white border-2 border-emerald-300 rounded-xl text-lg sm:text-xl font-black text-emerald-950 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border-2 border-emerald-300 dark:border-emerald-700/60 rounded-xl text-lg sm:text-xl font-black text-emerald-950 dark:text-emerald-200 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             {/* Quick Booster Amount Buttons */}
             <div className="flex items-center gap-1.5 flex-wrap pt-1">
-              <span className="text-[11px] font-semibold text-emerald-800 mr-1">Quick Add:</span>
+              <span className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 mr-1">Quick Add:</span>
               {[1000, 5000, 10000, 25000, 50000, 100000].map((val) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => handleAddQuickAmount(val)}
-                  className="px-2.5 py-1 text-xs font-bold bg-white text-emerald-800 border border-emerald-300 rounded-lg hover:bg-emerald-100 active:scale-95 transition-all shadow-2xs"
+                  className="px-2.5 py-1 text-xs font-bold bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 active:scale-95 transition-all shadow-2xs"
                 >
                   +{val >= 1000 ? `${val / 1000}k` : val}
                 </button>
@@ -363,8 +363,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Donor Name */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <span>Donor Name (نام / شناخت) *</span>
               </label>
               <input
@@ -373,18 +373,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 value={donorName}
                 onChange={(e) => setDonorName(e.target.value)}
                 placeholder="e.g. Haji Ghulam Murtaza, Chaudhry Riaz..."
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
             </div>
 
             {/* Village Name */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                   <span>Village Name (گاؤں کا نام) *</span>
                 </label>
-                <span className="text-[10px] text-slate-400">Open text or select preset</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500">Open text or select preset</span>
               </div>
               <input
                 type="text"
@@ -392,7 +392,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 value={villageName}
                 onChange={(e) => setVillageName(e.target.value)}
                 placeholder="e.g. Khushi Kot, Surjal, Palak, Kotli, Danna Misrial..."
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
 
               {/* Village Quick Selection Chips */}
@@ -405,7 +405,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all ${
                       villageName === vp
                         ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     {vp}
@@ -415,31 +415,31 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           </div>
 
-          {/* Payment Source Selection (4 Large Touch Buttons) */}
+          {/* Payment Source Selection (6 Large Touch Buttons) */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-slate-400" />
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <span>Source of Transaction (ذریعہ ادائیگی) *</span>
             </label>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {/* Cash */}
               <button
                 type="button"
                 onClick={() => setSource('Cash')}
                 className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                   source === 'Cash'
-                    ? 'border-emerald-600 bg-emerald-50/80 ring-2 ring-emerald-500/30'
-                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                    ? 'border-emerald-600 bg-emerald-50/80 dark:bg-emerald-950/30 ring-2 ring-emerald-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-xl">💵</span>
-                  {source === 'Cash' && <Check className="w-4 h-4 text-emerald-600" />}
+                  {source === 'Cash' && <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
                 </div>
                 <div className="mt-2">
-                  <strong className="text-xs font-bold text-slate-800 block">Cash</strong>
-                  <span className="text-[11px] text-emerald-700 font-urdu">نقد وصولی</span>
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Cash</strong>
+                  <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-urdu">نقد وصولی</span>
                 </div>
               </button>
 
@@ -449,17 +449,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 onClick={() => setSource('Easypesa')}
                 className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                   source === 'Easypesa'
-                    ? 'border-teal-600 bg-teal-50/80 ring-2 ring-teal-500/30'
-                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                    ? 'border-teal-600 bg-teal-50/80 dark:bg-teal-950/30 ring-2 ring-teal-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-xl">📱</span>
-                  {source === 'Easypesa' && <Check className="w-4 h-4 text-teal-600" />}
+                  {source === 'Easypesa' && <Check className="w-4 h-4 text-teal-600 dark:text-teal-400" />}
                 </div>
                 <div className="mt-2">
-                  <strong className="text-xs font-bold text-slate-800 block">EasyPaisa</strong>
-                  <span className="text-[11px] text-teal-700 font-urdu">ایزی پیسہ</span>
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">EasyPaisa</strong>
+                  <span className="text-[11px] text-teal-700 dark:text-teal-400 font-urdu">ایزی پیسہ</span>
                 </div>
               </button>
 
@@ -469,17 +469,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 onClick={() => setSource('Jazzcash')}
                 className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                   source === 'Jazzcash'
-                    ? 'border-amber-600 bg-amber-50/80 ring-2 ring-amber-500/30'
-                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                    ? 'border-amber-600 bg-amber-50/80 dark:bg-amber-950/30 ring-2 ring-amber-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-xl">⚡</span>
-                  {source === 'Jazzcash' && <Check className="w-4 h-4 text-amber-600" />}
+                  {source === 'Jazzcash' && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
                 </div>
                 <div className="mt-2">
-                  <strong className="text-xs font-bold text-slate-800 block">JazzCash</strong>
-                  <span className="text-[11px] text-amber-700 font-urdu">جاز کیش</span>
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">JazzCash</strong>
+                  <span className="text-[11px] text-amber-700 dark:text-amber-400 font-urdu">جاز کیش</span>
                 </div>
               </button>
 
@@ -489,17 +489,57 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 onClick={() => setSource('BankTransfer')}
                 className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                   source === 'BankTransfer'
-                    ? 'border-blue-600 bg-blue-50/80 ring-2 ring-blue-500/30'
-                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                    ? 'border-blue-600 bg-blue-50/80 dark:bg-blue-950/30 ring-2 ring-blue-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-xl">🏛️</span>
-                  {source === 'BankTransfer' && <Check className="w-4 h-4 text-blue-600" />}
+                  {source === 'BankTransfer' && <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
                 </div>
                 <div className="mt-2">
-                  <strong className="text-xs font-bold text-slate-800 block">Bank Transfer</strong>
-                  <span className="text-[11px] text-blue-700 font-urdu">بینک اکاؤنٹ</span>
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Bank Transfer</strong>
+                  <span className="text-[11px] text-blue-700 dark:text-blue-400 font-urdu">بینک اکاؤنٹ</span>
+                </div>
+              </button>
+
+              {/* Material */}
+              <button
+                type="button"
+                onClick={() => setSource('Material')}
+                className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                  source === 'Material'
+                    ? 'border-violet-600 bg-violet-50/80 dark:bg-violet-950/30 ring-2 ring-violet-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xl">🧱</span>
+                  {source === 'Material' && <Check className="w-4 h-4 text-violet-600 dark:text-violet-400" />}
+                </div>
+                <div className="mt-2">
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Material</strong>
+                  <span className="text-[11px] text-violet-700 dark:text-violet-400 font-urdu">سامان</span>
+                </div>
+              </button>
+
+              {/* Remaining (pledged, not yet received) */}
+              <button
+                type="button"
+                onClick={() => setSource('Remaining')}
+                className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                  source === 'Remaining'
+                    ? 'border-rose-600 bg-rose-50/80 dark:bg-rose-950/30 ring-2 ring-rose-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xl">⏳</span>
+                  {source === 'Remaining' && <Check className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
+                </div>
+                <div className="mt-2">
+                  <strong className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Remaining</strong>
+                  <span className="text-[11px] text-rose-700 dark:text-rose-400 font-urdu">بقایا</span>
                 </div>
               </button>
             </div>
@@ -509,8 +549,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {/* Reference */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <FileText className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <FileText className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <span>Reference / TRX ID / Note</span>
               </label>
               <input
@@ -518,14 +558,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
                 placeholder="TRX ID, Check #, or Book Slip"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
             </div>
 
             {/* Date */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <span>Date (تاریخ) *</span>
               </label>
               <input
@@ -533,14 +573,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
             </div>
 
             {/* Receipt Number */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <Hash className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <Hash className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <span>Receipt # (رسید نمبر)</span>
               </label>
               <input
@@ -548,7 +588,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 value={receiptNumber}
                 onChange={(e) => setReceiptNumber(e.target.value)}
                 placeholder="AR-1001"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
             </div>
           </div>
@@ -556,13 +596,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           {/* Verified By / Committee Collector & Notes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Received / Verified By</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Received / Verified By</label>
               <input
                 type="text"
                 value={verifiedBy}
                 onChange={(e) => setVerifiedBy(e.target.value)}
                 placeholder="Collector name"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100"
               />
               <div className="flex gap-1 overflow-x-auto pt-0.5 scrollbar-none">
                 {committeePresets.map(cp => (
@@ -570,7 +610,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     key={cp}
                     type="button"
                     onClick={() => setVerifiedBy(cp)}
-                    className="text-[10px] text-slate-500 hover:text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[140px]"
+                    className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded truncate max-w-[140px]"
                   >
                     {cp.split(' ')[0]} {cp.split(' ')[1] || ''}
                   </button>
@@ -579,13 +619,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Notes / Dua / Dedication (Optional)</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Notes / Dua / Dedication (Optional)</label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="e.g. Esaal-e-Sawab for Marhoom parents..."
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900"
+                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100"
               />
             </div>
           </div>
@@ -597,9 +637,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 type="button"
                 disabled={isDeletingRecord || isSaving}
                 onClick={() => setShowDeleteConfirm(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-rose-300 dark:border-rose-700/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
               >
-                <Trash2 className="w-4 h-4 text-rose-600" />
+                <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                 <span>Delete from DB</span>
               </button>
             ) : (
@@ -611,7 +651,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <button
                   type="button"
                   onClick={onCancelEdit}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50"
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -646,35 +686,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             className="fixed inset-0"
             onClick={() => !isDeletingRecord && setShowDeleteConfirm(false)}
           ></div>
-          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 border border-slate-200 shadow-2xl z-10 space-y-4">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl z-10 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-slate-900">Delete Donation from DB?</h3>
-                <p className="text-xs text-slate-500">This action will remove the record permanently.</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Delete Donation from DB?</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">This action will remove the record permanently.</p>
               </div>
             </div>
 
-            <div className="bg-rose-50/50 border border-rose-200 rounded-2xl p-4 space-y-2 text-xs">
+            <div className="bg-rose-50/50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 rounded-2xl p-4 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500 font-medium">Donor Name:</span>
-                <span className="font-bold text-slate-900">{editingDonation.donorName}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Donor Name:</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{editingDonation.donorName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500 font-medium">Amount:</span>
-                <span className="font-extrabold text-rose-700 text-sm">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Amount:</span>
+                <span className="font-extrabold text-rose-700 dark:text-rose-400 text-sm">
                   {formatPKR(editingDonation.amount)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500 font-medium">Receipt #:</span>
-                <span className="font-mono text-slate-700">{editingDonation.receiptNumber}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Receipt #:</span>
+                <span className="font-mono text-slate-700 dark:text-slate-300">{editingDonation.receiptNumber}</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Are you sure you want to permanently delete this donation from the <strong>Supabase Database</strong> and the live ledger?
             </p>
 
@@ -683,7 +723,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 type="button"
                 disabled={isDeletingRecord}
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors"
+                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 Cancel
               </button>
@@ -715,12 +755,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         <div className="p-4 sm:p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* CSV Excel Card */}
-            <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-              <h4 className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-emerald-700" />
+            <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2">
+              <h4 className="text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                 <span>Export for Village Notice Board (Excel)</span>
               </h4>
-              <p className="text-xs text-emerald-800">
+              <p className="text-xs text-emerald-800 dark:text-emerald-300">
                 Download a clean spreadsheet containing all {donations.length} transactions, donor names, amounts, and dates.
               </p>
               <button
@@ -734,18 +774,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             {/* JSON Full Backup */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <Download className="w-4 h-4 text-slate-700" />
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                <Download className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                 <span>Save Offline Backup (JSON)</span>
               </h4>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Keep a safe backup file on your phone or computer so you never lose village records.
               </p>
               <button
                 type="button"
                 onClick={handleExportJSON}
-                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-900"
+                className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold hover:bg-slate-900 dark:hover:bg-slate-600"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export Data Backup</span>
@@ -753,15 +793,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             {/* Restore from JSON */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <Upload className="w-4 h-4 text-slate-700" />
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                <Upload className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                 <span>Restore from Backup File</span>
               </h4>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Upload a previously saved `.json` file to restore all donations.
               </p>
-              <label className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 cursor-pointer">
+              <label className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
                 <Upload className="w-3.5 h-3.5" />
                 <span>Choose Backup File</span>
                 <input
@@ -774,12 +814,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             {/* Reset to Sample Data */}
-            <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-2">
-              <h4 className="text-sm font-bold text-amber-950 flex items-center gap-1.5">
-                <RotateCcw className="w-4 h-4 text-amber-700" />
+            <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2">
+              <h4 className="text-sm font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                <RotateCcw className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                 <span>Reset to Seed Data</span>
               </h4>
-              <p className="text-xs text-amber-800">
+              <p className="text-xs text-amber-800 dark:text-amber-300">
                 Re-load the standard Awami Road sample transactions (14 community donations).
               </p>
               <button

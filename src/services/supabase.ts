@@ -54,7 +54,7 @@ export const toDbRow = (d: Donation): SupabaseDonationRow => ({
 // Convert Supabase DB Row back to frontend Donation
 export const fromDbRow = (row: any): Donation => {
   const sourceVal = row.source || 'Easypesa';
-  const validSource: PaymentSource = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash'].includes(sourceVal)
+  const validSource: PaymentSource = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash', 'Material', 'Remaining'].includes(sourceVal)
     ? (sourceVal as PaymentSource)
     : 'Easypesa';
 

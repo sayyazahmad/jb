@@ -33,9 +33,9 @@ export function getSourceDetails(source: PaymentSource): {
         label: 'Cash (نقد)',
         labelUrdu: 'نقد',
         color: '#16a34a',
-        badgeBg: 'bg-emerald-50 text-emerald-800',
-        badgeText: 'text-emerald-700',
-        badgeBorder: 'border-emerald-200',
+        badgeBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300',
+        badgeText: 'text-emerald-700 dark:text-emerald-400',
+        badgeBorder: 'border-emerald-200 dark:border-emerald-800/60',
         iconName: 'cash'
       };
     case 'Easypesa':
@@ -43,9 +43,9 @@ export function getSourceDetails(source: PaymentSource): {
         label: 'EasyPaisa (ایزی پیسہ)',
         labelUrdu: 'ایزی پیسہ',
         color: '#10b981',
-        badgeBg: 'bg-teal-50 text-teal-800',
-        badgeText: 'text-teal-700',
-        badgeBorder: 'border-teal-200',
+        badgeBg: 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300',
+        badgeText: 'text-teal-700 dark:text-teal-400',
+        badgeBorder: 'border-teal-200 dark:border-teal-800/60',
         iconName: 'easypaisa'
       };
     case 'Jazzcash':
@@ -53,9 +53,9 @@ export function getSourceDetails(source: PaymentSource): {
         label: 'JazzCash (جاز کیش)',
         labelUrdu: 'جاز کیش',
         color: '#ea580c',
-        badgeBg: 'bg-amber-50 text-amber-900',
-        badgeText: 'text-amber-700',
-        badgeBorder: 'border-amber-200',
+        badgeBg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200',
+        badgeText: 'text-amber-700 dark:text-amber-400',
+        badgeBorder: 'border-amber-200 dark:border-amber-800/60',
         iconName: 'jazzcash'
       };
     case 'BankTransfer':
@@ -63,19 +63,39 @@ export function getSourceDetails(source: PaymentSource): {
         label: 'Bank Transfer (بینک)',
         labelUrdu: 'بینک ٹرانسفر',
         color: '#2563eb',
-        badgeBg: 'bg-blue-50 text-blue-800',
-        badgeText: 'text-blue-700',
-        badgeBorder: 'border-blue-200',
+        badgeBg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300',
+        badgeText: 'text-blue-700 dark:text-blue-400',
+        badgeBorder: 'border-blue-200 dark:border-blue-800/60',
         iconName: 'bank'
+      };
+    case 'Material':
+      return {
+        label: 'Material (سامان)',
+        labelUrdu: 'سامان',
+        color: '#7c3aed',
+        badgeBg: 'bg-violet-50 dark:bg-violet-950/40 text-violet-800 dark:text-violet-300',
+        badgeText: 'text-violet-700 dark:text-violet-400',
+        badgeBorder: 'border-violet-200 dark:border-violet-800/60',
+        iconName: 'cash'
+      };
+    case 'Remaining':
+      return {
+        label: 'Remaining (بقایا)',
+        labelUrdu: 'بقایا',
+        color: '#e11d48',
+        badgeBg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300',
+        badgeText: 'text-rose-700 dark:text-rose-400',
+        badgeBorder: 'border-rose-200 dark:border-rose-800/60',
+        iconName: 'cash'
       };
     default:
       return {
         label: source,
         labelUrdu: source,
         color: '#64748b',
-        badgeBg: 'bg-slate-50 text-slate-800',
-        badgeText: 'text-slate-700',
-        badgeBorder: 'border-slate-200',
+        badgeBg: 'bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200',
+        badgeText: 'text-slate-700 dark:text-slate-300',
+        badgeBorder: 'border-slate-200 dark:border-slate-800',
         iconName: 'cash'
       };
   }
