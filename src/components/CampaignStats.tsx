@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, TrendingUp, Award, Sparkles, HeartHandshake, Target } from 'lucide-react';
+import { Users, Award, Sparkles, HeartHandshake, Target } from 'lucide-react';
 import { Donation, ProjectSettings, RoadMilestone } from '../types';
 import { formatPKR, formatLakhs } from '../utils/formatters';
 
@@ -20,7 +20,6 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
   const remainingToGoal = Math.max(targetGoal - totalRaised, 0);
   const donorCount = donations.length;
   const maxDonation = donations.length > 0 ? Math.max(...donations.map(d => d.amount)) : 0;
-  const avgDonation = donations.length > 0 ? Math.round(totalRaised / donations.length) : 0;
 
   return (
     <div className="space-y-4">
@@ -104,7 +103,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
           )}
 
           {/* Sub Stats Grid */}
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 pt-1">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 pt-1">
             <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
               <div className="flex items-center justify-center text-amber-300 mb-1">
                 <Users className="w-4 h-4" />
@@ -120,17 +119,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
               <div className="text-lg sm:text-2xl font-bold text-white truncate">
                 {formatPKR(maxDonation)}
               </div>
-              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Highest Gift</div>
-            </div>
-
-            <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
-              <div className="flex items-center justify-center text-amber-300 mb-1">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-              <div className="text-lg sm:text-2xl font-bold text-white truncate">
-                {formatPKR(avgDonation)}
-              </div>
-              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Average Contribution</div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Highest Donation</div>
             </div>
           </div>
         </div>
