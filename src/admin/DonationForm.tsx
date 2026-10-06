@@ -59,7 +59,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
   };
 
   // Common village presets as requested
-  const villagePresets = ['Khushi Kot', 'Surjal', 'Palak', 'Kotli', 'Danna Misrial'];
+  const villagePresets = ['Khushi Kot', 'Surjal', 'Palak', 'Kotli / Qablia', 'Danna Misrial', 'Arwar'];
   const committeePresets = ['Tanveer Wilayat', 'Faisal Abbasi', 'Talib Abbasi'];
 
   // Fill form if editing

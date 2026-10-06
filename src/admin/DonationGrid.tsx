@@ -19,12 +19,12 @@ type SortDir = 'asc' | 'desc';
 const SOURCES: PaymentSource[] = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash', 'Material', 'Remaining'];
 
 const COLUMNS: { key: SortKey; label: string; align?: 'right' }[] = [
-  { key: 'date', label: 'Date' },
   { key: 'donorName', label: 'Donor' },
   { key: 'villageName', label: 'Village' },
+  { key: 'amount', label: 'Amount', align: 'right' },
   { key: 'referredBy', label: 'Reference' },
   { key: 'source', label: 'Source' },
-  { key: 'amount', label: 'Amount', align: 'right' },
+  { key: 'date', label: 'Date' },
 ];
 
 const PAGE_SIZES = [25, 50, 100];
@@ -255,7 +255,6 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                 const src = getSourceDetails(d.source);
                 return (
                   <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400 whitespace-nowrap">{d.date}</td>
                     <td className="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100 min-w-[160px]">
                       <span>{d.donorName}</span>
                       {d.isAnonymous && (
@@ -268,13 +267,14 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                       )}
                     </td>
                     <td className="px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap">{d.villageName}</td>
+                    <td className="px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{formatPKR(d.amount)}</td>
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 min-w-[120px]">{d.referredBy || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${src.badgeBg} ${src.badgeBorder}`}>
                         {src.label.split(' (')[0]}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{formatPKR(d.amount)}</td>
+                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400 whitespace-nowrap">{d.date}</td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
                       <button
                         onClick={() => onEdit(d)}
