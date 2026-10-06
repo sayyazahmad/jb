@@ -1,6 +1,7 @@
 import React from 'react';
 import { Monitor, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+import { InstallButton } from './InstallButton';
 
 const THEME_OPTIONS = {
   system: { icon: Monitor, label: 'System theme' },
@@ -50,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({ actions, children }) => {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            <InstallButton />
             {actions}
 
             {/* Theme toggle: System → Light → Dark */}

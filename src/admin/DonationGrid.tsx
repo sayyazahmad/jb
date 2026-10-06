@@ -18,6 +18,23 @@ type SortDir = 'asc' | 'desc';
 
 const SOURCES: PaymentSource[] = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash', 'Material', 'Remaining'];
 
+type Anonymity = 'all' | 'anonymous' | 'named';
+
+// The grid unmounts while the edit screen is open. Keeping its view state at module level means
+// returning from Edit (save, cancel or browser Back) lands on the same page, filters and scroll
+// position. It resets on a full page reload.
+const savedView = {
+  query: '',
+  village: 'all',
+  source: 'all',
+  anonymity: 'all' as Anonymity,
+  sortKey: 'amount' as SortKey,
+  sortDir: 'desc' as SortDir,
+  page: 1,
+  pageSize: 25,
+  scrollY: null as number | null,
+};
+
 const COLUMNS: { key: SortKey; label: string; align?: 'right' }[] = [
   { key: 'donorName', label: 'Donor' },
   { key: 'villageName', label: 'Village' },
@@ -43,16 +60,16 @@ const selectClass =
   'px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500';
 
 export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew, onEdit }) => {
-  const [query, setQuery] = useState('');
-  const [village, setVillage] = useState('all');
-  const [source, setSource] = useState('all');
-  const [anonymity, setAnonymity] = useState<'all' | 'anonymous' | 'named'>('all');
-  const [sortKey, setSortKey] = useState<SortKey>('amount');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [query, setQuery] = useState(savedView.query);
+  const [village, setVillage] = useState(savedView.village);
+  const [source, setSource] = useState(savedView.source);
+  const [anonymity, setAnonymity] = useState<Anonymity>(savedView.anonymity);
+  const [sortKey, setSortKey] = useState<SortKey>(savedView.sortKey);
+  const [sortDir, setSortDir] = useState<SortDir>(savedView.sortDir);
   const [exporting, setExporting] = useState<'excel' | 'pdf' | null>(null);
   const [exportError, setExportError] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  const [page, setPage] = useState(savedView.page);
+  const [pageSize, setPageSize] = useState(savedView.pageSize);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const villages = useMemo(
@@ -85,10 +102,34 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
 
   const filteredTotal = rows.reduce((sum, d) => sum + d.amount, 0);
 
-  // Back to the first page whenever the result set or its order changes
+  // Back to the first page whenever the result set or its order changes — but not on mount,
+  // so a page restored from savedView survives coming back from the edit screen
+  const isFirstRun = useRef(true);
   useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
     setPage(1);
   }, [query, village, source, anonymity, sortKey, sortDir, pageSize]);
+
+  // Remember the view for the next time the grid mounts
+  useEffect(() => {
+    Object.assign(savedView, { query, village, source, anonymity, sortKey, sortDir, page, pageSize });
+  }, [query, village, source, anonymity, sortKey, sortDir, page, pageSize]);
+
+  // Restore the scroll position saved when Edit was clicked (navigation scrolls to the top)
+  useEffect(() => {
+    if (savedView.scrollY === null) return;
+    const y = savedView.scrollY;
+    savedView.scrollY = null;
+    requestAnimationFrame(() => window.scrollTo({ top: y }));
+  }, []);
+
+  const handleEdit = (d: Donation) => {
+    savedView.scrollY = window.scrollY;
+    onEdit(d);
+  };
 
   // Clamp in case rows shrink under the current page (e.g. a realtime delete)
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
@@ -200,7 +241,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
             <option value="all">All sources</option>
             {SOURCES.map(s => <option key={s} value={s}>{getSourceDetails(s).label.split(' (')[0]}</option>)}
           </select>
-          <select value={anonymity} onChange={(e) => setAnonymity(e.target.value as typeof anonymity)} className={selectClass} aria-label="Filter by anonymity">
+          <select value={anonymity} onChange={(e) => setAnonymity(e.target.value as Anonymity)} className={selectClass} aria-label="Filter by anonymity">
             <option value="all">Named & anonymous</option>
             <option value="named">Named only</option>
             <option value="anonymous">Anonymous only</option>
@@ -277,7 +318,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 whitespace-nowrap">{d.date}</td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
                       <button
-                        onClick={() => onEdit(d)}
+                        onClick={() => handleEdit(d)}
                         className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-lg border border-amber-200 dark:border-amber-800/60 cursor-pointer"
                       >
                         <Pencil className="w-3 h-3" />
