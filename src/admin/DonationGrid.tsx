@@ -266,8 +266,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap">{d.villageName}</td>
-                    <td className="px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{formatPKR(d.amount)}</td>
+                    <td className="px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap truncate max-w-20 sm:max-w-none" title={d.villageName}>{d.villageName}</td>
+                    <td className="px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{d.amount.toLocaleString('en-PK')}</td>
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 min-w-[120px]">{d.referredBy || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${src.badgeBg} ${src.badgeBorder}`}>
