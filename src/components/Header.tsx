@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ actions, children }) => {
                   عوامی سڑک
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-emerald-100 font-medium truncate flex items-center gap-1">
+              <p className="text-xs sm:text-sm text-emerald-100 font-medium flex flex-wrap items-center gap-x-1">
                 <span>GEWA Morh to Butti</span>
                 <span className="text-emerald-400 font-bold">•</span>
                 <span className="text-amber-300 text-xs">جیوا موڑ تا بٹی</span>

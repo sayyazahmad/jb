@@ -40,10 +40,11 @@ export const InstallButton: React.FC = () => {
     <button
       onClick={handleInstall}
       title="Install as an app"
+      aria-label="Install as an app"
       className="no-print px-2.5 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-amber-200 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1 cursor-pointer"
     >
       <Download className="w-3.5 h-3.5" />
-      <span>Install</span>
+      <span className="hidden sm:inline">Install</span>
     </button>
   );
 };

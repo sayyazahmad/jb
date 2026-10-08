@@ -330,7 +330,7 @@ export const DonationList: React.FC<DonationListProps> = ({
                     {/* Donor Details */}
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className={`text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 transition-colors truncate ${onSelectDonation ? 'group-hover:text-emerald-700 dark:group-hover:text-emerald-400' : ''}`}>
+                        <h4 className={`text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 transition-colors break-words min-w-0 ${onSelectDonation ? 'group-hover:text-emerald-700 dark:group-hover:text-emerald-400' : ''}`}>
                           {donation.donorName}
                         </h4>
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
