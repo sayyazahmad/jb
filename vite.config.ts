@@ -37,7 +37,8 @@ export default defineConfig(() => {
       // install as separate apps.
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: 'script-defer',
+        // Registered from each entry's main.tsx (src/registerServiceWorker.ts) so updates reload promptly
+        injectRegister: false,
         manifest: false,
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
@@ -60,6 +61,11 @@ export default defineConfig(() => {
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/admin/],
           cleanupOutdatedCaches: true,
+          // Take over open pages as soon as a new deploy is downloaded (registerServiceWorker.ts then
+          // reloads once). Without these the new version waits until every tab and installed-app
+          // window is closed, which on phones can mean never.
+          skipWaiting: true,
+          clientsClaim: true,
           runtimeCaching: [
             {
               urlPattern: ({request, url}) => request.mode === 'navigate' && url.pathname.startsWith('/admin'),
