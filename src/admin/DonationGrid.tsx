@@ -28,6 +28,8 @@ const savedView = {
   village: 'all',
   source: 'all',
   anonymity: 'all' as Anonymity,
+  dateFrom: '', // YYYY-MM-DD, inclusive; '' = no limit
+  dateTo: '',
   sortKey: 'amount' as SortKey,
   sortDir: 'desc' as SortDir,
   page: 1,
@@ -65,6 +67,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
   const [village, setVillage] = useState(savedView.village);
   const [source, setSource] = useState(savedView.source);
   const [anonymity, setAnonymity] = useState<Anonymity>(savedView.anonymity);
+  const [dateFrom, setDateFrom] = useState(savedView.dateFrom);
+  const [dateTo, setDateTo] = useState(savedView.dateTo);
   const [sortKey, setSortKey] = useState<SortKey>(savedView.sortKey);
   const [sortDir, setSortDir] = useState<SortDir>(savedView.sortDir);
   const [exporting, setExporting] = useState<'excel' | 'pdf' | null>(null);
@@ -90,6 +94,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
       (village === 'all' || d.villageName.trim() === village) &&
       (source === 'all' || d.source === source) &&
       (anonymity === 'all' || (anonymity === 'anonymous') === !!d.isAnonymous) &&
+      (!dateFrom || d.date >= dateFrom) &&
+      (!dateTo || d.date <= dateTo) &&
       (!q ||
         d.id === q ||
         d.donorName.toLowerCase().includes(q) ||
@@ -100,7 +106,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
     );
 
     return filtered.sort(compare);
-  }, [donations, query, village, source, anonymity, sortKey, sortDir]);
+  }, [donations, query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir]);
 
   const filteredTotal = rows.reduce((sum, d) => sum + d.amount, 0);
 
@@ -113,12 +119,12 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
       return;
     }
     setPage(1);
-  }, [query, village, source, anonymity, sortKey, sortDir, pageSize]);
+  }, [query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, pageSize]);
 
   // Remember the view for the next time the grid mounts
   useEffect(() => {
-    Object.assign(savedView, { query, village, source, anonymity, sortKey, sortDir, page, pageSize });
-  }, [query, village, source, anonymity, sortKey, sortDir, page, pageSize]);
+    Object.assign(savedView, { query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize });
+  }, [query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize]);
 
   // Restore the scroll position saved when Edit was clicked (navigation scrolls to the top)
   useEffect(() => {
@@ -145,7 +151,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
     const top = gridRef.current?.getBoundingClientRect().top ?? 0;
     if (top < 0) gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
-  const hasFilters = query !== '' || village !== 'all' || source !== 'all' || anonymity !== 'all';
+  const hasFilters = query !== '' || village !== 'all' || source !== 'all' || anonymity !== 'all' || dateFrom !== '' || dateTo !== '';
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -161,6 +167,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
     setVillage('all');
     setSource('all');
     setAnonymity('all');
+    setDateFrom('');
+    setDateTo('');
   };
 
   const runExport = async (kind: 'excel' | 'pdf') => {
@@ -248,6 +256,30 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
             <option value="named">Named only</option>
             <option value="anonymous">Anonymous only</option>
           </select>
+          {/* Date range (inclusive). The "to" picker can't go before "from" and vice versa. */}
+          <div className="flex items-center gap-1.5">
+            <label className="sr-only" htmlFor="grid-date-from">From date</label>
+            <input
+              id="grid-date-from"
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className={selectClass}
+              title="From date"
+            />
+            <span className="text-xs text-slate-400 dark:text-slate-500">to</span>
+            <label className="sr-only" htmlFor="grid-date-to">To date</label>
+            <input
+              id="grid-date-to"
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(e) => setDateTo(e.target.value)}
+              className={selectClass}
+              title="To date"
+            />
+          </div>
           {hasFilters && (
             <button
               onClick={clearFilters}
