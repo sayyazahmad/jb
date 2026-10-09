@@ -309,7 +309,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                   return (
                     <th
                       key={col.key}
-                      className={`px-3 py-2.5 font-semibold whitespace-nowrap border-b border-slate-200 dark:border-slate-800 ${col.align === 'right' ? 'text-right' : 'text-left'}`}
+                      className={`px-2 sm:px-3 py-2.5 font-semibold whitespace-nowrap border-b border-slate-200 dark:border-slate-800 ${col.align === 'right' ? 'text-right' : 'text-left'}`}
                       aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                     >
                       <button
@@ -324,7 +324,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                         ) : (
                           <span>{col.label}</span>
                         )}
-                        <Icon className={`w-3 h-3 ${active ? '' : 'opacity-40'}`} />
+                        <Icon className={`w-3 h-3 ${active ? '' : 'opacity-40 hidden sm:inline'}`} />
                       </button>
                     </th>
                   );
@@ -337,8 +337,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                 const src = getSourceDetails(d.source);
                 return (
                   <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="px-2 sm:px-3 py-2 font-mono text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{d.id}</td>
-                    <td className="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100 min-w-[160px]">
+                    <td className="px-1.5 sm:px-3 py-2 font-mono text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{d.id}</td>
+                    <td className="px-2 sm:px-3 py-2 font-semibold text-slate-900 dark:text-slate-100 min-w-[120px] sm:min-w-[160px]">
                       <span>{d.donorName}</span>
                       {d.isAnonymous && (
                         <span
@@ -349,8 +349,8 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap truncate max-w-20 sm:max-w-none" title={d.villageName}>{d.villageName}</td>
-                    <td className="px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{d.amount.toLocaleString('en-PK')}</td>
+                    <td className="px-2 sm:px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap truncate max-w-16 sm:max-w-none" title={d.villageName}>{d.villageName}</td>
+                    <td className="px-2 sm:px-3 py-2 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap tabular-nums">{d.amount.toLocaleString('en-PK')}</td>
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 min-w-[120px]">{d.referredBy || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${src.badgeBg} ${src.badgeBorder}`}>
