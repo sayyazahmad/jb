@@ -9,7 +9,10 @@ export type AdminRoute =
   | { name: 'list' }
   | { name: 'new' }
   | { name: 'edit'; id: string }
-  | { name: 'backup' };
+  | { name: 'backup' }
+  | { name: 'expenses' }
+  | { name: 'expenseNew' }
+  | { name: 'expenseEdit'; id: string };
 
 export const parseAdminRoute = (pathname: string): AdminRoute => {
   const sub = pathname.startsWith(ADMIN_BASE) ? pathname.slice(ADMIN_BASE.length) : pathname;
@@ -17,6 +20,11 @@ export const parseAdminRoute = (pathname: string): AdminRoute => {
   if (parts[0] === 'new') return { name: 'new' };
   if (parts[0] === 'edit' && parts[1]) return { name: 'edit', id: decodeURIComponent(parts[1]) };
   if (parts[0] === 'backup') return { name: 'backup' };
+  if (parts[0] === 'expenses') {
+    if (parts[1] === 'new') return { name: 'expenseNew' };
+    if (parts[1] === 'edit' && parts[2]) return { name: 'expenseEdit', id: decodeURIComponent(parts[2]) };
+    return { name: 'expenses' };
+  }
   return { name: 'list' };
 };
 
@@ -25,6 +33,9 @@ export const adminPath = (route: AdminRoute): string => {
     case 'new': return `${ADMIN_BASE}/new`;
     case 'edit': return `${ADMIN_BASE}/edit/${encodeURIComponent(route.id)}`;
     case 'backup': return `${ADMIN_BASE}/backup`;
+    case 'expenses': return `${ADMIN_BASE}/expenses`;
+    case 'expenseNew': return `${ADMIN_BASE}/expenses/new`;
+    case 'expenseEdit': return `${ADMIN_BASE}/expenses/edit/${encodeURIComponent(route.id)}`;
     default: return `${ADMIN_BASE}/`;
   }
 };

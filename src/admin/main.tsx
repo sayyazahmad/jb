@@ -5,5 +5,6 @@ import '../index.css';
 
 createRoot(document.getElementById('root')!).render(<AdminApp />);
 
-// Never reload under an admin who is filling in the Add/Edit form; the update applies on the next screen
-registerServiceWorker({canReload: () => !/^\/admin\/(new|edit)(\/|$)/.test(window.location.pathname)});
+// Never reload under an admin who is filling in an Add/Edit form (donation or expense); the update
+// applies on the next screen
+registerServiceWorker({canReload: () => !/^\/admin\/(expenses\/)?(new|edit)(\/|$)/.test(window.location.pathname)});

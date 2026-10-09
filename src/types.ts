@@ -42,3 +42,22 @@ export interface ProjectSettings {
   committeeMembers: CommitteeMember[];
   announcements: string[];
 }
+
+export type ExpenseType = 'Material' | 'Labour' | 'Machinery' | 'Transport' | 'Other';
+
+export interface Expense {
+  id: string; // sequential number assigned by the database (shown as Expense #)
+  date: string; // YYYY-MM-DD
+  type: ExpenseType;
+  description: string; // e.g. "Cement", "Labour – excavation"
+  quantity?: number; // e.g. 200 (bags), 30 (worker-days), 8 (hours)
+  unit?: string; // e.g. "bags", "worker-days", "hours", "trips"
+  rate?: number; // PKR per unit
+  amount: number; // PKR total
+  payee?: string; // vendor / worker / operator paid
+  paymentMethod?: string; // Cash, Bank Transfer, EasyPaisa, ...
+  notes?: string;
+  receipts: string[]; // storage paths in the "receipts" bucket
+  createdAt: number;
+  updatedAt?: number;
+}

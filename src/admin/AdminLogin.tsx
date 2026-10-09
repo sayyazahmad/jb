@@ -45,7 +45,6 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ status, email, onSignIn,
       <input
         type={showPassword ? 'text' : 'password'}
         required
-        minLength={8}
         value={value}
         onChange={(e) => { onChange(e.target.value); setError(''); }}
         placeholder={placeholder}
@@ -100,7 +99,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ status, email, onSignIn,
           run(() => onSetPassword(password));
         }}
       >
-        {passwordField(password, setPassword, 'New password (at least 8 characters)', 'new-password')}
+        {passwordField(password, setPassword, 'New password', 'new-password')}
         {passwordField(confirm, setConfirm, 'Repeat new password', 'new-password')}
         {error && <ErrorBox message={error} />}
         <button type="submit" disabled={busy} className={primaryButton}>

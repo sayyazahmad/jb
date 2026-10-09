@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Trophy, ListOrdered } from 'lucide-react';
+import { Trophy, ListOrdered, ReceiptText } from 'lucide-react';
 import { RoadMilestone } from './types';
 import { INITIAL_MILESTONES } from './data/initialData';
 import { Header } from './components/Header';
@@ -13,6 +13,8 @@ import { DonationList } from './components/DonationList';
 import { VillageLeaderboard } from './components/VillageLeaderboard';
 import { formatPKR } from './utils/formatters';
 import { useDonations, useSettings } from './hooks/useDonations';
+import { useExpenses } from './hooks/useExpenses';
+import { ExpenseList } from './components/ExpenseList';
 
 // The admin area is a separate app at /admin. Keep old secret links (?admin, ?mode=admin, #admin) working.
 const isLegacyAdminUrl = () => {
@@ -31,12 +33,13 @@ if (isLegacyAdminUrl()) {
 export default function App() {
   const { donations } = useDonations();
   const { settings } = useSettings();
+  const { expenses } = useExpenses();
   const [milestones] = useState<RoadMilestone[]>(INITIAL_MILESTONES);
 
   // Active view tab for public navigation
   // 'ledger' = Main donation list (highest on top)
   // 'villages' = Village rankings
-  const [activeTab, setActiveTab] = useState<'ledger' | 'villages'>('ledger');
+  const [activeTab, setActiveTab] = useState<'ledger' | 'expenses' | 'villages'>('ledger');
 
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
 
@@ -58,6 +61,7 @@ export default function App() {
         {/* Campaign Hero & Stats */}
         <CampaignStats
           donations={donations}
+          expenses={expenses}
           settings={settings}
           milestones={milestones}
         />
@@ -75,6 +79,19 @@ export default function App() {
             <ListOrdered className="w-4 h-4" />
             <span>Donations List ({donations.length})</span>
             <span className="hidden xs:inline font-urdu text-xs opacity-90">عطیات</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('expenses')}
+            className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'expenses'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            <ReceiptText className="w-4 h-4" />
+            <span>Expenses</span>
+            <span className="hidden xs:inline font-urdu text-xs opacity-90">اخراجات</span>
           </button>
 
           <button
@@ -97,6 +114,8 @@ export default function App() {
             donations={visibleDonations}
           />
         )}
+
+        {activeTab === 'expenses' && <ExpenseList expenses={expenses} />}
 
         {activeTab === 'villages' && (
           <VillageLeaderboard

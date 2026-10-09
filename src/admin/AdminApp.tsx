@@ -1,10 +1,13 @@
 import React from 'react';
-import { ListOrdered, PlusCircle, Download, LogOut, ExternalLink, ArrowLeft } from 'lucide-react';
+import { ListOrdered, PlusCircle, Download, LogOut, ExternalLink, ArrowLeft, ReceiptText } from 'lucide-react';
 import { Header } from '../components/Header';
 import { useDonations, useSettings } from '../hooks/useDonations';
+import { useExpenses } from '../hooks/useExpenses';
 import { DonationForm } from './DonationForm';
 import { BackupPanel } from './BackupPanel';
 import { DonationGrid } from './DonationGrid';
+import { ExpenseGrid } from './ExpenseGrid';
+import { ExpenseForm } from './ExpenseForm';
 import { AdminRoute, navigate, useAdminRoute } from './router';
 import { AdminLogin } from './AdminLogin';
 import { useAdminAuth } from './useAdminAuth';
@@ -18,13 +21,15 @@ try {
 
 const NAV_ITEMS: { route: AdminRoute; label: string; icon: React.ElementType }[] = [
   { route: { name: 'list' }, label: 'Donations', icon: ListOrdered },
-  { route: { name: 'new' }, label: 'Add New', icon: PlusCircle },
+  { route: { name: 'new' }, label: 'Add Donation', icon: PlusCircle },
+  { route: { name: 'expenses' }, label: 'Expenses', icon: ReceiptText },
   { route: { name: 'backup' }, label: 'Backup', icon: Download },
 ];
 
 export default function AdminApp() {
   const { donations, setDonations, saveDonation, deleteDonation, isLoaded } = useDonations();
   const { settings } = useSettings();
+  const { expenses, saveExpense, removeExpense, isLoaded: expensesLoaded } = useExpenses();
   const route = useAdminRoute();
 
   // Supabase Auth session + admins-list check (the database enforces the same rule on writes)
@@ -52,9 +57,13 @@ export default function AdminApp() {
   }
 
   const isNavActive = (item: AdminRoute) =>
-    item.name === route.name || (item.name === 'list' && route.name === 'edit');
+    item.name === route.name ||
+    (item.name === 'list' && route.name === 'edit') ||
+    (item.name === 'expenses' && (route.name === 'expenseNew' || route.name === 'expenseEdit'));
 
   const editingDonation = route.name === 'edit' ? donations.find(d => d.id === route.id) || null : null;
+  const editingExpense = route.name === 'expenseEdit' ? expenses.find(e => e.id === route.id) || null : null;
+  const toExpenses = () => navigate({ name: 'expenses' });
 
   return (
     <div className="min-h-screen bg-slate-100/70 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 pb-12">
@@ -145,6 +154,36 @@ export default function AdminApp() {
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to list</span>
               </button>
+            </div>
+          )
+        )}
+
+        {route.name === 'expenses' && (
+          <ExpenseGrid
+            expenses={expenses}
+            onAddNew={() => navigate({ name: 'expenseNew' })}
+            onEdit={(expense) => navigate({ name: 'expenseEdit', id: expense.id })}
+          />
+        )}
+
+        {route.name === 'expenseNew' && (
+          <ExpenseForm editingExpense={null} onSave={saveExpense} onDelete={removeExpense} onDone={toExpenses} />
+        )}
+
+        {route.name === 'expenseEdit' && (
+          editingExpense ? (
+            <ExpenseForm key={editingExpense.id} editingExpense={editingExpense} onSave={saveExpense} onDelete={removeExpense} onDone={toExpenses} />
+          ) : (
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-3">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {expensesLoaded ? 'Expense not found. It may have been deleted.' : 'Loading expense…'}
+              </p>
+              {expensesLoaded && (
+                <button onClick={toExpenses} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to expenses</span>
+                </button>
+              )}
             </div>
           )
         )}

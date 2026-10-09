@@ -1,10 +1,11 @@
 import React from 'react';
-import { Users, Award, Sparkles, HeartHandshake, Target } from 'lucide-react';
-import { Donation, ProjectSettings, RoadMilestone } from '../types';
+import { Users, Award, Sparkles, HeartHandshake, Target, ReceiptText, Wallet } from 'lucide-react';
+import { Donation, Expense, ProjectSettings, RoadMilestone } from '../types';
 import { formatPKR, formatLakhs } from '../utils/formatters';
 
 interface CampaignStatsProps {
   donations: Donation[];
+  expenses: Expense[];
   settings: ProjectSettings;
   milestones: RoadMilestone[];
   onAddClick?: () => void;
@@ -12,9 +13,12 @@ interface CampaignStatsProps {
 
 export const CampaignStats: React.FC<CampaignStatsProps> = ({
   donations,
+  expenses,
   settings
 }) => {
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
+  const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const inHand = totalRaised - totalSpent;
   const targetGoal = settings.targetGoal;
   const progressPct = targetGoal > 0 ? (totalRaised / targetGoal) * 100 : 0;
   const remainingToGoal = Math.max(targetGoal - totalRaised, 0);
@@ -120,6 +124,23 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
                 {formatPKR(maxDonation)}
               </div>
               <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Highest Donation</div>
+            </div>
+
+            {/* Construction spending: collected − spent = in hand */}
+            <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
+              <div className="flex items-center justify-center text-rose-300 mb-1">
+                <ReceiptText className="w-4 h-4" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-white truncate">{formatPKR(totalSpent)}</div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Spent / <span className="font-urdu">خرچ</span></div>
+            </div>
+
+            <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
+              <div className="flex items-center justify-center text-amber-300 mb-1">
+                <Wallet className="w-4 h-4" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold text-white truncate">{formatPKR(inHand)}</div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">In hand / <span className="font-urdu">موجود رقم</span></div>
             </div>
           </div>
         </div>
