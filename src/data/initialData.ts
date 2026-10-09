@@ -6,9 +6,6 @@ export const INITIAL_SETTINGS: ProjectSettings = {
   routeDescription: 'Jeeva Morh to Butti',
   targetGoal: 4500000, // 45 Lakhs PKR Target
   roadLengthKm: 4.5,
-  adminPin: '1234',
-  adminUsername: 'admin',
-  adminPassword: 'Ochor1!',
   committeeMembers: [
     {
       name: 'Tanveer Wilayat',

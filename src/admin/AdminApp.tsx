@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ListOrdered, PlusCircle, Download, LogOut, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Header } from '../components/Header';
-import { AdminLoginModal } from '../components/AdminLoginModal';
 import { useDonations, useSettings } from '../hooks/useDonations';
 import { DonationForm } from './DonationForm';
 import { BackupPanel } from './BackupPanel';
 import { DonationGrid } from './DonationGrid';
 import { AdminRoute, navigate, useAdminRoute } from './router';
+import { AdminLogin } from './AdminLogin';
+import { useAdminAuth } from './useAdminAuth';
 
-const STORAGE_KEY_ADMIN_AUTH = 'awami_road_admin_auth_v2';
+// Old client-side "logged in" flag from before real Supabase Auth; remove it from browsers
+try {
+  localStorage.removeItem('awami_road_admin_auth_v2');
+} catch {
+  // ignore
+}
 
 const NAV_ITEMS: { route: AdminRoute; label: string; icon: React.ElementType }[] = [
   { route: { name: 'list' }, label: 'Donations', icon: ListOrdered },
@@ -21,38 +27,25 @@ export default function AdminApp() {
   const { settings } = useSettings();
   const route = useAdminRoute();
 
-  // Admin authentication state (client-side only, see AdminLoginModal)
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY_ADMIN_AUTH) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  // Supabase Auth session + admins-list check (the database enforces the same rule on writes)
+  const auth = useAdminAuth();
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_ADMIN_AUTH, isAdmin ? 'true' : 'false');
-    } catch {
-      // ignore
-    }
-  }, [isAdmin]);
-
-  const handleLogout = () => {
-    setIsAdmin(false);
+  const handleLogout = async () => {
+    await auth.signOut();
     navigate({ name: 'list' });
   };
 
-  if (!isAdmin) {
+  if (auth.status !== 'admin') {
     return (
-      <div className="min-h-screen bg-slate-100/70 dark:bg-slate-950">
+      <div className="min-h-screen bg-slate-100/70 dark:bg-slate-950 pb-12">
         <Header />
-        <AdminLoginModal
-          isOpen
-          onClose={() => { window.location.href = '/'; }}
-          expectedUsername={settings.adminUsername || 'admin'}
-          expectedPassword={settings.adminPassword || 'Ochor1!'}
-          onSuccess={() => setIsAdmin(true)}
+        <AdminLogin
+          status={auth.status}
+          email={auth.email}
+          onSignIn={auth.signIn}
+          onSendReset={auth.sendPasswordReset}
+          onSetPassword={auth.setNewPassword}
+          onSignOut={auth.signOut}
         />
       </div>
     );
@@ -78,7 +71,7 @@ export default function AdminApp() {
             </a>
             <button
               onClick={handleLogout}
-              title="Log out"
+              title={auth.email ? `Log out ${auth.email}` : 'Log out'}
               className="px-2.5 py-1.5 rounded-xl text-xs text-emerald-200 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />

@@ -39,9 +39,6 @@ export interface ProjectSettings {
   routeDescription: string;
   targetGoal: number; // in PKR
   roadLengthKm: number;
-  adminPin: string;
-  adminUsername?: string;
-  adminPassword?: string;
   committeeMembers: CommitteeMember[];
   announcements: string[];
 }

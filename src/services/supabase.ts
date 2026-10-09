@@ -265,15 +265,25 @@ alter table public.donations enable row level security;
 create policy "Allow public read" on public.donations
   for select using (true);
 
--- Public write access (Admin / App can save, update, and delete)
-create policy "Allow public insert" on public.donations
-  for insert with check (true);
+-- Admins: committee members allowed to write (Supabase Auth users whose email is listed here).
+-- RLS on with no policies, so the list itself is not readable through the API.
+create table if not exists public.admins (email text primary key);
+alter table public.admins enable row level security;
 
-create policy "Allow public update" on public.donations
-  for update using (true);
+create or replace function public.is_admin() returns boolean
+  language sql stable security definer set search_path = public
+  as $fn$ select exists (select 1 from public.admins where email = lower(auth.jwt() ->> 'email')) $fn$;
+grant execute on function public.is_admin() to anon, authenticated;
 
-create policy "Allow public delete" on public.donations
-  for delete using (true);
+-- Write access: signed-in admins only
+create policy "Admins insert" on public.donations
+  for insert to authenticated with check (public.is_admin());
+
+create policy "Admins update" on public.donations
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+create policy "Admins delete" on public.donations
+  for delete to authenticated using (public.is_admin());
 
 -- Enable Realtime publication so all connected devices update live:
 alter publication supabase_realtime add table public.donations;
