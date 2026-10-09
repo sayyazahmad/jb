@@ -3,6 +3,7 @@ import { Donation, ProjectSettings } from '../types';
 import { INITIAL_SETTINGS } from '../data/initialData';
 import {
   saveDonationToSupabase,
+  insertDonationToSupabase,
   deleteDonationFromSupabase,
   fetchDonationsFromSupabase,
   subscribeToDonationChanges,
@@ -102,14 +103,11 @@ export const useDonations = () => {
       );
       await saveDonationToSupabase(updatedItem);
     } else {
-      // Create new
-      const newDonation: Donation = {
-        ...donationData,
-        id: `don-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        createdAt: Date.now()
-      };
-      setDonations(prev => [newDonation, ...prev]);
-      await saveDonationToSupabase(newDonation);
+      // Create new: the database assigns the next sequential id, so add it once the insert returns
+      // (the realtime INSERT event may arrive first; skip it if so)
+      const { id: _none, ...fields } = donationData;
+      const created = await insertDonationToSupabase({ ...fields, createdAt: Date.now() });
+      setDonations(prev => (prev.some(d => d.id === created.id) ? prev : [created, ...prev]));
     }
   };
 

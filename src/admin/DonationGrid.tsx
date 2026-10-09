@@ -13,7 +13,7 @@ interface DonationGridProps {
   onEdit: (donation: Donation) => void;
 }
 
-type SortKey = 'date' | 'donorName' | 'villageName' | 'referredBy' | 'source' | 'amount';
+type SortKey = 'id' | 'date' | 'donorName' | 'villageName' | 'referredBy' | 'source' | 'amount';
 type SortDir = 'asc' | 'desc';
 
 const SOURCES: PaymentSource[] = ['Cash', 'BankTransfer', 'Easypesa', 'Jazzcash', 'Material', 'Remaining'];
@@ -35,7 +35,8 @@ const savedView = {
   scrollY: null as number | null,
 };
 
-const COLUMNS: { key: SortKey; label: string; align?: 'right' }[] = [
+const COLUMNS: { key: SortKey; label: string; shortLabel?: string; align?: 'right' }[] = [
+  { key: 'id', label: 'Receipt #', shortLabel: '#' },
   { key: 'donorName', label: 'Donor' },
   { key: 'villageName', label: 'Village' },
   { key: 'amount', label: 'Amount', align: 'right' },
@@ -84,12 +85,13 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
   };
 
   const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase().replace(/^#/, '');
     const filtered = donations.filter(d =>
       (village === 'all' || d.villageName.trim() === village) &&
       (source === 'all' || d.source === source) &&
       (anonymity === 'all' || (anonymity === 'anonymous') === !!d.isAnonymous) &&
       (!q ||
+        d.id === q ||
         d.donorName.toLowerCase().includes(q) ||
         d.villageName.toLowerCase().includes(q) ||
         (d.reference || '').toLowerCase().includes(q) ||
@@ -229,7 +231,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search name, village, reference, transaction, notes..."
+              placeholder="Search receipt #, name, village, reference, notes..."
               className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
           </div>
@@ -282,7 +284,14 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                         onClick={() => toggleSort(col.key)}
                         className={`inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-white cursor-pointer ${active ? 'text-emerald-700 dark:text-emerald-400' : ''}`}
                       >
-                        <span>{col.label}</span>
+                        {col.shortLabel ? (
+                          <>
+                            <span className="sm:hidden">{col.shortLabel}</span>
+                            <span className="hidden sm:inline">{col.label}</span>
+                          </>
+                        ) : (
+                          <span>{col.label}</span>
+                        )}
                         <Icon className={`w-3 h-3 ${active ? '' : 'opacity-40'}`} />
                       </button>
                     </th>
@@ -296,6 +305,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
                 const src = getSourceDetails(d.source);
                 return (
                   <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <td className="px-2 sm:px-3 py-2 font-mono text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{d.id}</td>
                     <td className="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100 min-w-[160px]">
                       <span>{d.donorName}</span>
                       {d.isAnonymous && (
