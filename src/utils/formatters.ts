@@ -18,6 +18,21 @@ export function formatLakhs(amount: number): string {
   return `${amount}`;
 }
 
+/**
+ * Row outline colour that flags non-cash entries at a glance in the admin grid (border only, no fill):
+ * Material = yellow, Remaining (pledged, not yet received) = red.
+ */
+export function getSourceHighlight(source: PaymentSource): { outline: string } | null {
+  switch (source) {
+    case 'Material':
+      return { outline: 'outline-yellow-400 dark:outline-yellow-500' };
+    case 'Remaining':
+      return { outline: 'outline-red-500 dark:outline-red-500' };
+    default:
+      return null;
+  }
+}
+
 export function getSourceDetails(source: PaymentSource): {
   label: string;
   labelUrdu: string;

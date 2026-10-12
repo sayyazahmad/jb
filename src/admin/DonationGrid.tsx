@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight
 } from 'lucide-react';
 import { Donation, PaymentSource } from '../types';
-import { formatPKR, getSourceDetails } from '../utils/formatters';
+import { formatPKR, getSourceDetails, getSourceHighlight } from '../utils/formatters';
 import { exportDonationsToExcel, exportDonationsToPDF } from './exports';
 
 interface DonationGridProps {
@@ -336,7 +336,12 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
               {pageRows.map(d => {
                 const src = getSourceDetails(d.source);
                 return (
-                  <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <tr
+                    key={d.id}
+                    className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                      getSourceHighlight(d.source) ? `outline-2 -outline-offset-2 ${getSourceHighlight(d.source)!.outline}` : ''
+                    }`}
+                  >
                     <td className="px-1.5 sm:px-3 py-2 font-mono text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{d.id}</td>
                     <td className="px-2 sm:px-3 py-2 font-semibold text-slate-900 dark:text-slate-100 min-w-[120px] sm:min-w-[160px]">
                       <span>{d.donorName}</span>
