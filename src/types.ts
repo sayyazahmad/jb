@@ -1,5 +1,7 @@
 export type PaymentSource = 'Cash' | 'BankTransfer' | 'Easypesa' | 'Jazzcash' | 'Material' | 'Remaining';
 
+export type DonationPhase = 1 | 2;
+
 export interface Donation {
   id: string;
   donorName: string;
@@ -12,6 +14,7 @@ export interface Donation {
   isAnonymous?: boolean; // Shown as "Anonymous" in the public view; admins see the real name
   verifiedBy?: string;
   referredBy?: string; // Person the donation came through — admin only, never shown publicly
+  phase: DonationPhase; // Fundraising phase; rows from before phases existed are Phase 1
   createdAt: number;
 }
 

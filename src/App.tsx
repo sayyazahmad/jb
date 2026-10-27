@@ -5,14 +5,15 @@
 
 import React, { useState, useMemo } from 'react';
 import { Trophy, ListOrdered, ReceiptText } from 'lucide-react';
-import { RoadMilestone } from './types';
-import { INITIAL_MILESTONES } from './data/initialData';
+import { DonationPhase, RoadMilestone } from './types';
+import { CURRENT_PHASE, INITIAL_MILESTONES, getPhase } from './data/initialData';
+import { PhaseTabs } from './components/PhaseTabs';
 import { Header } from './components/Header';
 import { CampaignStats } from './components/CampaignStats';
 import { DonationList } from './components/DonationList';
 import { VillageLeaderboard } from './components/VillageLeaderboard';
 import { formatPKR } from './utils/formatters';
-import { useDonations, useSettings } from './hooks/useDonations';
+import { useDonations } from './hooks/useDonations';
 import { useExpenses } from './hooks/useExpenses';
 import { ExpenseList } from './components/ExpenseList';
 
@@ -32,7 +33,6 @@ if (isLegacyAdminUrl()) {
 
 export default function App() {
   const { donations } = useDonations();
-  const { settings } = useSettings();
   const { expenses } = useExpenses();
   const [milestones] = useState<RoadMilestone[]>(INITIAL_MILESTONES);
 
@@ -41,14 +41,18 @@ export default function App() {
   // 'villages' = Village rankings
   const [activeTab, setActiveTab] = useState<'ledger' | 'expenses' | 'villages'>('ledger');
 
-  const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
+  // Phase tabs: everything below them (stats, ledger, villages) shows the selected phase only
+  const [phase, setPhase] = useState<DonationPhase>(CURRENT_PHASE);
+  const phaseDonations = useMemo(() => donations.filter(d => d.phase === phase), [donations, phase]);
+
+  const totalRaised = phaseDonations.reduce((sum, d) => sum + d.amount, 0);
 
   // Public view: donors who asked to hide their name are shown as "Anonymous" (admins see real names in /admin),
   // and the admin-only reference person is dropped. Doing it here covers the list, search, receipts,
   // WhatsApp text and CSV export in one place.
   const visibleDonations = useMemo(
-    () => donations.map(({ referredBy: _adminOnly, ...d }) => (d.isAnonymous ? { ...d, donorName: 'Anonymous' } : d)),
-    [donations]
+    () => phaseDonations.map(({ referredBy: _adminOnly, ...d }) => (d.isAnonymous ? { ...d, donorName: 'Anonymous' } : d)),
+    [phaseDonations]
   );
 
   return (
@@ -58,11 +62,14 @@ export default function App() {
 
       {/* Main Container */}
       <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
+        <PhaseTabs donations={donations} phase={phase} onChange={setPhase} />
+
         {/* Campaign Hero & Stats */}
         <CampaignStats
-          donations={donations}
+          donations={phaseDonations}
+          allDonations={donations}
+          phase={phase}
           expenses={expenses}
-          settings={settings}
           milestones={milestones}
         />
 
@@ -77,7 +84,7 @@ export default function App() {
             }`}
           >
             <ListOrdered className="w-4 h-4" />
-            <span>Donations List ({donations.length})</span>
+            <span>Donations List ({phaseDonations.length})</span>
             <span className="hidden xs:inline font-urdu text-xs opacity-90">عطیات</span>
           </button>
 
@@ -130,7 +137,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
           <div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold leading-tight">Total Collected</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold leading-tight">{getPhase(phase).label} Collected</div>
             <div className="text-xs font-black text-emerald-800 dark:text-emerald-300 leading-tight">{formatPKR(totalRaised)}</div>
           </div>
         </div>

@@ -34,6 +34,7 @@ export interface SupabaseDonationRow {
   verified_by: string | null;
   referred_by: string | null;
   is_anonymous: boolean;
+  phase: number;
   created_at: number;
 }
 
@@ -50,6 +51,7 @@ export const toDbRow = (d: Donation): SupabaseDonationRow => ({
   verified_by: d.verifiedBy || null,
   referred_by: d.referredBy || null,
   is_anonymous: !!d.isAnonymous,
+  phase: d.phase,
   created_at: d.createdAt || Date.now()
 });
 
@@ -72,6 +74,7 @@ export const fromDbRow = (row: any): Donation => {
     verifiedBy: row.verified_by || row.verifiedBy || '',
     referredBy: row.referred_by || row.referredBy || '',
     isAnonymous: !!(row.is_anonymous ?? row.isAnonymous),
+    phase: Number(row.phase) === 2 ? 2 : 1,
     createdAt: typeof row.created_at === 'number' ? row.created_at : Date.now()
   };
 };
@@ -250,6 +253,7 @@ create table if not exists public.donations (
   verified_by text,
   referred_by text,
   is_anonymous boolean not null default false,
+  phase smallint not null default 2,
   created_at bigint not null default (extract(epoch from now()) * 1000)::bigint
 );
 
@@ -257,6 +261,11 @@ create table if not exists public.donations (
 alter table public.donations add column if not exists is_anonymous boolean not null default false;
 alter table public.donations add column if not exists referred_by text;
 alter table public.donations drop column if exists receipt_number;
+
+-- Phase 2 migration: every donation recorded before phases existed belongs to Phase 1 (the add sets them to 1),
+-- then new rows default to Phase 2. The app always sends the phase explicitly.
+alter table public.donations add column if not exists phase smallint not null default 1;
+alter table public.donations alter column phase set default 2;
 
 -- Enable Row Level Security (RLS)
 alter table public.donations enable row level security;

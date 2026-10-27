@@ -29,7 +29,8 @@ export const useDonations = () => {
       const saved = localStorage.getItem(STORAGE_KEY_DONATIONS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        // Caches written before phases existed have no phase: those donations are all Phase 1
+        if (Array.isArray(parsed)) return parsed.map((d: Donation) => ({ ...d, phase: d.phase === 2 ? 2 : 1 }));
       }
     } catch (e) {
       console.error('Failed to load local storage donations', e);

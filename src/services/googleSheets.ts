@@ -1,4 +1,5 @@
 import { Donation, PaymentSource } from '../types';
+import { CURRENT_PHASE } from '../data/initialData';
 
 export interface SheetSyncResult {
   success: boolean;
@@ -268,6 +269,7 @@ export const fetchDonationsFromSheet = async (
       amount,
       notes,
       verifiedBy,
+      phase: CURRENT_PHASE,
       createdAt: new Date(date).getTime() || Date.now()
     };
   });

@@ -31,7 +31,8 @@ export const BackupPanel: React.FC<BackupPanelProps> = ({ donations, onImportDat
         try {
           const parsed = JSON.parse(event.target?.result as string);
           if (Array.isArray(parsed)) {
-            onImportData(parsed);
+            // Backups from before phases existed have no phase: those donations are all Phase 1
+            onImportData(parsed.map((d: Donation) => ({ ...d, phase: d.phase === 2 ? 2 : 1 })));
             setSuccessToast(`Successfully restored ${parsed.length} donations!`);
             setTimeout(() => setSuccessToast(''), 4000);
           } else {

@@ -3,7 +3,9 @@ import {
   Search, Plus, Pencil, FileSpreadsheet, FileText, ArrowUp, ArrowDown, ArrowUpDown, EyeOff, X, RefreshCw,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight
 } from 'lucide-react';
-import { Donation, PaymentSource } from '../types';
+import { Donation, DonationPhase, PaymentSource } from '../types';
+import { CURRENT_PHASE, getPhase } from '../data/initialData';
+import { PhaseTabs } from '../components/PhaseTabs';
 import { formatPKR, getSourceDetails, getSourceHighlight } from '../utils/formatters';
 import { exportDonationsToExcel, exportDonationsToPDF } from './exports';
 
@@ -24,6 +26,7 @@ type Anonymity = 'all' | 'anonymous' | 'named';
 // returning from Edit (save, cancel or browser Back) lands on the same page, filters and scroll
 // position. It resets on a full page reload.
 const savedView = {
+  phase: CURRENT_PHASE as DonationPhase,
   query: '',
   village: 'all',
   source: 'all',
@@ -62,7 +65,11 @@ const pageButtonClass =
 const selectClass =
   'px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500';
 
-export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew, onEdit }) => {
+export const DonationGrid: React.FC<DonationGridProps> = ({ donations: allDonations, onAddNew, onEdit }) => {
+  // Everything below the phase tabs (filters, totals, exports) works on the selected phase only
+  const [phase, setPhase] = useState<DonationPhase>(savedView.phase);
+  const donations = useMemo(() => allDonations.filter(d => d.phase === phase), [allDonations, phase]);
+  const phaseLabel = getPhase(phase).label;
   const [query, setQuery] = useState(savedView.query);
   const [village, setVillage] = useState(savedView.village);
   const [source, setSource] = useState(savedView.source);
@@ -119,12 +126,12 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
       return;
     }
     setPage(1);
-  }, [query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, pageSize]);
+  }, [phase, query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, pageSize]);
 
   // Remember the view for the next time the grid mounts
   useEffect(() => {
-    Object.assign(savedView, { query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize });
-  }, [query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize]);
+    Object.assign(savedView, { phase, query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize });
+  }, [phase, query, village, source, anonymity, dateFrom, dateTo, sortKey, sortDir, page, pageSize]);
 
   // Restore the scroll position saved when Edit was clicked (navigation scrolls to the top)
   useEffect(() => {
@@ -175,10 +182,10 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
     setExportError('');
     setExporting(kind);
     try {
-      // Exports always include every donation (filters ignored), in the grid's current sort order
+      // Exports include every donation of the selected phase (filters ignored), in the grid's current sort order
       const all = [...donations].sort(compare);
-      if (kind === 'excel') await exportDonationsToExcel(all);
-      else await exportDonationsToPDF(all);
+      if (kind === 'excel') await exportDonationsToExcel(all, phaseLabel);
+      else await exportDonationsToPDF(all, phaseLabel);
     } catch (err: any) {
       console.error('Export failed', err);
       setExportError(err?.message || 'Export failed. Please try again.');
@@ -189,11 +196,13 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
 
   return (
     <div className="space-y-4">
+      <PhaseTabs donations={allDonations} phase={phase} onChange={setPhase} />
+
       {/* Toolbar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="min-w-0">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">All Donations</h2>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">{phaseLabel} Donations</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {donations.length} records • {formatPKR(donations.reduce((sum, d) => sum + d.amount, 0))}
             </p>
@@ -203,7 +212,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
               onClick={() => runExport('excel')}
               disabled={exporting !== null}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800/60 disabled:opacity-60 transition-colors cursor-pointer"
-              title="Download all donations as an Excel file"
+              title={`Download all ${phaseLabel} donations as an Excel file`}
             >
               {exporting === 'excel' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
               <span>Excel</span>
@@ -212,7 +221,7 @@ export const DonationGrid: React.FC<DonationGridProps> = ({ donations, onAddNew,
               onClick={() => runExport('pdf')}
               disabled={exporting !== null}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/60 disabled:opacity-60 transition-colors cursor-pointer"
-              title="Download all donations as a PDF"
+              title={`Download all ${phaseLabel} donations as a PDF`}
             >
               {exporting === 'pdf' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
               <span>PDF</span>

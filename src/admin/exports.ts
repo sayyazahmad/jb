@@ -6,10 +6,13 @@ import { getSourceDetails } from '../utils/formatters';
 
 const today = () => new Date().toISOString().split('T')[0];
 
+// "Phase 2" -> "phase2" for file names
+const fileTag = (label: string) => label.toLowerCase().replace(/\s+/g, '');
+
 // English-only label ("Bank Transfer (بینک)" -> "Bank Transfer"): the PDF's built-in fonts can't render Urdu
 const sourceLabel = (d: Donation) => getSourceDetails(d.source).label.split(' (')[0];
 
-export const exportDonationsToExcel = async (donations: Donation[]) => {
+export const exportDonationsToExcel = async (donations: Donation[], phaseLabel: string) => {
   const { default: writeXlsxFile } = await import('write-excel-file/browser');
   const header = (value: string) => ({ value, fontWeight: 'bold' as const });
 
@@ -38,17 +41,17 @@ export const exportDonationsToExcel = async (donations: Donation[]) => {
     sheet: 'Donations',
     columns: [{ width: 12 }, { width: 32 }, { width: 11 }, { width: 16 }, { width: 22 }, { width: 15 }, { width: 14 }, { width: 24 }, { width: 36 }, { width: 18 }],
     stickyRowsCount: 1,
-  }).toFile(`awami_road_donations_${today()}.xlsx`);
+  }).toFile(`awami_road_donations_${fileTag(phaseLabel)}_${today()}.xlsx`);
 };
 
-export const exportDonationsToPDF = async (donations: Donation[]) => {
+export const exportDonationsToPDF = async (donations: Donation[], phaseLabel: string) => {
   const [{ jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
   const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
   const total = donations.reduce((sum, d) => sum + d.amount, 0);
   const fmt = (n: number) => n.toLocaleString('en-PK');
 
   doc.setFontSize(16);
-  doc.text('Awami Road - Donations Ledger', 40, 40);
+  doc.text(`Awami Road - ${phaseLabel} Donations Ledger`, 40, 40);
   doc.setFontSize(10);
   doc.text(`Generated ${today()}  |  ${donations.length} donations  |  Total Rs. ${fmt(total)}`, 40, 58);
 
@@ -73,5 +76,5 @@ export const exportDonationsToPDF = async (donations: Donation[]) => {
     showFoot: 'lastPage',
   });
 
-  doc.save(`awami_road_donations_${today()}.pdf`);
+  doc.save(`awami_road_donations_${fileTag(phaseLabel)}_${today()}.pdf`);
 };

@@ -5,7 +5,8 @@ import {
   RefreshCw, AlertTriangle, ArrowLeft, UserCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Donation, PaymentSource } from '../types';
+import { Donation, DonationPhase, PaymentSource } from '../types';
+import { CURRENT_PHASE, PHASES } from '../data/initialData';
 import { formatPKR } from '../utils/formatters';
 import { DonationInput } from '../hooks/useDonations';
 
@@ -35,6 +36,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
   const [verifiedBy, setVerifiedBy] = useState('Tanveer Wilayat');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [referredBy, setReferredBy] = useState('');
+  const [phase, setPhase] = useState<DonationPhase>(CURRENT_PHASE);
 
   const [errorMsg, setErrorMsg] = useState('');
   const [successToast, setSuccessToast] = useState('');
@@ -75,6 +77,7 @@ export const DonationForm: React.FC<DonationFormProps> = ({
       setVerifiedBy(editingDonation.verifiedBy || '');
       setIsAnonymous(!!editingDonation.isAnonymous);
       setReferredBy(editingDonation.referredBy || '');
+      setPhase(editingDonation.phase);
     }
   }, [editingDonation]);
 
@@ -133,7 +136,8 @@ export const DonationForm: React.FC<DonationFormProps> = ({
       notes: notes.trim(),
       verifiedBy: verifiedBy.trim(),
       referredBy: referredBy.trim(),
-      isAnonymous
+      isAnonymous,
+      phase
     };
 
     setIsSaving(true);
@@ -228,6 +232,29 @@ export const DonationForm: React.FC<DonationFormProps> = ({
               </button>
             </div>
           )}
+
+          {/* Phase: new donations default to the current phase; can be changed to correct a misfiled record */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Phase (مرحلہ) *</span>
+            <div className="inline-flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl" role="radiogroup" aria-label="Phase">
+              {PHASES.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={phase === p.id}
+                  onClick={() => setPhase(p.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    phase === p.id
+                      ? 'bg-amber-500 text-emerald-950 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Amount Box (Prominent for fast phone entry) */}
           <div className="bg-gradient-to-r from-emerald-50 dark:from-emerald-950/40 to-teal-50 dark:to-teal-950/40 p-4 sm:p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 space-y-2.5">

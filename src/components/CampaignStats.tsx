@@ -1,25 +1,30 @@
 import React from 'react';
 import { Users, Award, Sparkles, HeartHandshake, Target, ReceiptText, Wallet } from 'lucide-react';
-import { Donation, Expense, ProjectSettings, RoadMilestone } from '../types';
+import { Donation, DonationPhase, Expense, RoadMilestone } from '../types';
+import { getPhase } from '../data/initialData';
 import { formatPKR, formatLakhs } from '../utils/formatters';
 
 interface CampaignStatsProps {
+  /** Donations of the selected phase (total, target progress, donors, highest) */
   donations: Donation[];
+  /** Donations of every phase: expenses aren't split by phase, so In hand is all collected − all spent */
+  allDonations: Donation[];
+  phase: DonationPhase;
   expenses: Expense[];
-  settings: ProjectSettings;
   milestones: RoadMilestone[];
   onAddClick?: () => void;
 }
 
 export const CampaignStats: React.FC<CampaignStatsProps> = ({
   donations,
-  expenses,
-  settings
+  allDonations,
+  phase,
+  expenses
 }) => {
+  const { label: phaseLabel, labelUrdu: phaseLabelUrdu, targetGoal } = getPhase(phase);
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
   const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const inHand = totalRaised - totalSpent;
-  const targetGoal = settings.targetGoal;
+  const inHand = allDonations.reduce((sum, d) => sum + d.amount, 0) - totalSpent;
   const progressPct = targetGoal > 0 ? (totalRaised / targetGoal) * 100 : 0;
   const remainingToGoal = Math.max(targetGoal - totalRaised, 0);
   const donorCount = donations.length;
@@ -55,7 +60,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
           {/* Main Total Display */}
           <div className="space-y-1">
             <span className="text-xs sm:text-sm font-medium uppercase tracking-wider text-emerald-200/90 block">
-              Total Donations Collected / کل جمع شدہ رقم
+              {phaseLabel} Donations Collected / <span className="font-urdu">{phaseLabelUrdu} میں جمع شدہ رقم</span>
             </span>
             <div className="flex items-baseline gap-2.5 flex-wrap">
               <span className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">
@@ -113,7 +118,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
                 <Users className="w-4 h-4" />
               </div>
               <div className="text-xl sm:text-2xl font-bold text-white">{donorCount}</div>
-              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Total Donors</div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">{phaseLabel} Donors</div>
             </div>
 
             <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
@@ -132,7 +137,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
                 <ReceiptText className="w-4 h-4" />
               </div>
               <div className="text-lg sm:text-2xl font-bold text-white truncate">{formatPKR(totalSpent)}</div>
-              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Spent / <span className="font-urdu">خرچ</span></div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">Spent (all phases) / <span className="font-urdu">خرچ</span></div>
             </div>
 
             <div className="bg-emerald-950/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-emerald-700/40 text-center">
@@ -140,7 +145,7 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
                 <Wallet className="w-4 h-4" />
               </div>
               <div className="text-lg sm:text-2xl font-bold text-white truncate">{formatPKR(inHand)}</div>
-              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">In hand / <span className="font-urdu">موجود رقم</span></div>
+              <div className="text-[10px] sm:text-xs text-emerald-200 truncate mt-0.5">In hand (all phases) / <span className="font-urdu">موجود رقم</span></div>
             </div>
           </div>
         </div>
