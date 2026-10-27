@@ -1,14 +1,16 @@
 import { DonationPhase, ProjectSettings, RoadMilestone } from '../types';
 
-// Fundraising phases. Phase 1 (45 Lakh) is complete; Phase 2 extends the road. New donations go to CURRENT_PHASE.
+// Fundraising phases (80 Lakh overall). Phase 1 (45 Lakh) is complete; Phase 2 (35 Lakh) extends the road. New donations go to CURRENT_PHASE.
 export const CURRENT_PHASE: DonationPhase = 2;
 
 export const PHASES: { id: DonationPhase; label: string; labelUrdu: string; targetGoal: number }[] = [
-  { id: 2, label: 'Phase 2', labelUrdu: 'دوسرا مرحلہ', targetGoal: 8000000 },
+  { id: 2, label: 'Phase 2', labelUrdu: 'دوسرا مرحلہ', targetGoal: 3500000 },
   { id: 1, label: 'Phase 1', labelUrdu: 'پہلا مرحلہ', targetGoal: 4500000 },
 ];
 
 export const getPhase = (id: DonationPhase) => PHASES.find(p => p.id === id)!;
+
+export const TOTAL_TARGET = PHASES.reduce((sum, p) => sum + p.targetGoal, 0);
 
 export const INITIAL_SETTINGS: ProjectSettings = {
   projectName: 'AWAMI ROAD',

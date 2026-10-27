@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, Award, Sparkles, HeartHandshake, Target, ReceiptText, Wallet } from 'lucide-react';
 import { Donation, DonationPhase, Expense, RoadMilestone } from '../types';
-import { getPhase } from '../data/initialData';
+import { TOTAL_TARGET, getPhase } from '../data/initialData';
 import { formatPKR, formatLakhs } from '../utils/formatters';
 
 interface CampaignStatsProps {
@@ -24,7 +24,8 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
   const { label: phaseLabel, labelUrdu: phaseLabelUrdu, targetGoal } = getPhase(phase);
   const totalRaised = donations.reduce((sum, d) => sum + d.amount, 0);
   const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const inHand = allDonations.reduce((sum, d) => sum + d.amount, 0) - totalSpent;
+  const totalAllPhases = allDonations.reduce((sum, d) => sum + d.amount, 0);
+  const inHand = totalAllPhases - totalSpent;
   const progressPct = targetGoal > 0 ? (totalRaised / targetGoal) * 100 : 0;
   const remainingToGoal = Math.max(targetGoal - totalRaised, 0);
   const donorCount = donations.length;
@@ -107,6 +108,11 @@ export const CampaignStats: React.FC<CampaignStatsProps> = ({
                 ) : (
                   <span className="text-amber-300 font-semibold">🎉 Target reached! / ہدف مکمل</span>
                 )}
+              </div>
+              <div className="text-[11px] sm:text-xs text-emerald-200/80">
+                Both phases / <span className="font-urdu">دونوں مراحل</span>:{' '}
+                <strong className="text-white">{formatPKR(totalAllPhases)}</strong> of {formatPKR(TOTAL_TARGET)} ({formatLakhs(TOTAL_TARGET)}) •{' '}
+                {(TOTAL_TARGET > 0 ? (totalAllPhases / TOTAL_TARGET) * 100 : 0).toFixed(1)}%
               </div>
             </div>
           )}
