@@ -13,8 +13,8 @@ export const getPhase = (id: DonationPhase) => PHASES.find(p => p.id === id)!;
 export const TOTAL_TARGET = PHASES.reduce((sum, p) => sum + p.targetGoal, 0);
 
 export const INITIAL_SETTINGS: ProjectSettings = {
-  projectName: 'AWAMI ROAD',
-  projectNameUrdu: 'عوامی سڑک (جیوا موڑ تا بٹی)',
+  projectName: 'PAKS UNITY ROAD',
+  projectNameUrdu: 'پاکس یونٹی روڈ (جیوا موڑ تا بٹی)',
   routeDescription: 'Jeeva Morh to Butti',
   targetGoal: 4500000, // 45 Lakhs PKR Target
   roadLengthKm: 4.5,

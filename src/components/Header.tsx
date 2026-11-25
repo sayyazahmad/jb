@@ -27,19 +27,21 @@ export const Header: React.FC<HeaderProps> = ({ actions, children }) => {
         <div className="flex items-center justify-between gap-3">
           {/* Logo & Project Identity */}
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-emerald-500 p-0.5 shadow-md flex-shrink-0 flex items-center justify-center">
-              <div className="w-full h-full bg-emerald-950 rounded-[14px] flex items-center justify-center">
-                <span className="text-xl sm:text-2xl" role="img" aria-label="road">🛣️</span>
-              </div>
-            </div>
-            
+            <img
+              src="/icons/logo-256.png"
+              alt="PAKS Unity Road logo"
+              width={56}
+              height={56}
+              className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 object-contain drop-shadow-md"
+            />
+
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-base sm:text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                  AWAMI ROAD
+                  PAKS UNITY ROAD
                 </h1>
                 <span className="font-urdu text-xs sm:text-sm text-emerald-200 font-semibold px-2 py-0.5 rounded-full bg-emerald-900/80 border border-emerald-700/60 hidden xs:inline-block">
-                  عوامی سڑک
+                  پاکس یونٹی روڈ
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-emerald-100 font-medium flex flex-wrap items-center gap-x-1">

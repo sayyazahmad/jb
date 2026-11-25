@@ -16,6 +16,8 @@ import { formatPKR } from './utils/formatters';
 import { useDonations } from './hooks/useDonations';
 import { useExpenses } from './hooks/useExpenses';
 import { ExpenseList } from './components/ExpenseList';
+import { ThankYouModal } from './components/ThankYouModal';
+import { Footer } from './components/Footer';
 
 // The admin area is a separate app at /admin. Keep old secret links (?admin, ?mode=admin, #admin) working.
 const isLegacyAdminUrl = () => {
@@ -46,6 +48,11 @@ export default function App() {
   const phaseDonations = useMemo(() => donations.filter(d => d.phase === phase), [donations, phase]);
 
   const totalRaised = phaseDonations.reduce((sum, d) => sum + d.amount, 0);
+  const grandTotal = useMemo(() => donations.reduce((sum, d) => sum + d.amount, 0), [donations]);
+
+  // Thank-you popup opens on every page load
+  const [showThanks, setShowThanks] = useState(true);
+  const closeThanks = React.useCallback(() => setShowThanks(false), []);
 
   // Public view: donors who asked to hide their name are shown as "Anonymous" (admins see real names in /admin),
   // and the admin-only reference person is dropped. Doing it here covers the list, search, receipts,
@@ -62,6 +69,17 @@ export default function App() {
 
       {/* Main Container */}
       <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
+        {/* Road completed: reopen the thank-you message */}
+        <button
+          onClick={() => setShowThanks(true)}
+          dir="rtl"
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white px-4 py-2 shadow-sm transition-colors"
+        >
+          <span className="text-amber-300">✦</span>
+          <span className="font-urdu text-sm sm:text-base leading-[2.2]">الحمدللہ! سڑک مکمل ہو گئی — تمام عطیہ دہندگان کا شکریہ</span>
+          <span className="text-amber-300">✦</span>
+        </button>
+
         <PhaseTabs donations={donations} phase={phase} onChange={setPhase} />
 
         {/* Campaign Hero & Stats */}
@@ -132,6 +150,16 @@ export default function App() {
         )}
       </main>
 
+      {/* On phones the credit sits in the sticky bottom bar instead */}
+      <Footer className="hidden sm:block" />
+
+      <ThankYouModal
+        open={showThanks}
+        onClose={closeThanks}
+        donorCount={donations.length}
+        totalRaised={grandTotal}
+      />
+
       {/* Mobile Quick Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-2 px-4 sm:hidden flex items-center justify-between no-print shadow-lg">
         <div className="flex items-center gap-2">
@@ -140,6 +168,9 @@ export default function App() {
             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold leading-tight">{getPhase(phase).label} Collected</div>
             <div className="text-xs font-black text-emerald-800 dark:text-emerald-300 leading-tight">{formatPKR(totalRaised)}</div>
           </div>
+        </div>
+        <div className="text-[10px] text-slate-400 dark:text-slate-500 text-right leading-tight">
+          Developed by:<br />Sayyaz Ahmad
         </div>
       </div>
     </div>

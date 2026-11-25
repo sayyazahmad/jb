@@ -10,6 +10,7 @@ import { ExpenseGrid } from './ExpenseGrid';
 import { ExpenseForm } from './ExpenseForm';
 import { AdminRoute, navigate, useAdminRoute } from './router';
 import { AdminLogin } from './AdminLogin';
+import { Footer } from '../components/Footer';
 import { useAdminAuth } from './useAdminAuth';
 
 // Old client-side "logged in" flag from before real Supabase Auth; remove it from browsers
@@ -52,6 +53,7 @@ export default function AdminApp() {
           onSetPassword={auth.setNewPassword}
           onSignOut={auth.signOut}
         />
+        <Footer />
       </div>
     );
   }
@@ -195,6 +197,7 @@ export default function AdminApp() {
           />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

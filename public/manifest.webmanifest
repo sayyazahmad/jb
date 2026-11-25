@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Awami Road",
-  "short_name": "Awami Road",
-  "description": "Community crowdfunding ledger for the Jeeva Morh to Butti village road.",
+  "name": "PAKS Unity Road",
+  "short_name": "PAKS Road",
+  "description": "Community crowdfunding ledger for PAKS Unity Road (Jeeva Morh to Butti).",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

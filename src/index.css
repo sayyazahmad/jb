@@ -45,3 +45,16 @@ html {
     display: block !important;
   }
 }
+
+/* Thank-you popup (road completed) */
+@keyframes thanks-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes thanks-pop { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes thanks-heart { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.12); } 30% { transform: scale(1); } 45% { transform: scale(1.08); } }
+@keyframes thanks-twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+.thanks-fade { animation: thanks-fade 0.25s ease-out both; }
+.thanks-pop { animation: thanks-pop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.thanks-heart { animation: thanks-heart 2.2s ease-in-out infinite; }
+.thanks-twinkle { animation: thanks-twinkle 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .thanks-fade, .thanks-pop, .thanks-heart, .thanks-twinkle { animation: none; }
+}

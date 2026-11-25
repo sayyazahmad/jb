@@ -116,9 +116,9 @@ export function getSourceDetails(source: PaymentSource): {
   }
 }
 
-export function generateWhatsAppReceiptText(donation: Donation, projectName: string = 'AWAMI ROAD'): string {
+export function generateWhatsAppReceiptText(donation: Donation, projectName: string = 'PAKS UNITY ROAD'): string {
   return `*${projectName.toUpperCase()} (Jeeva Morh to Butti)*%0A` +
-    `*عوامی سڑک فنڈ - آفیشل رسید*%0A` +
+    `*پاکس یونٹی روڈ فنڈ - آفیشل رسید*%0A` +
     `--------------------------------%0A` +
     `*Donor Name:* ${donation.donorName}%0A` +
     `*Village:* ${donation.villageName}%0A` +

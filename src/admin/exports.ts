@@ -51,7 +51,7 @@ export const exportDonationsToPDF = async (donations: Donation[], phaseLabel: st
   const fmt = (n: number) => n.toLocaleString('en-PK');
 
   doc.setFontSize(16);
-  doc.text(`Awami Road - ${phaseLabel} Donations Ledger`, 40, 40);
+  doc.text(`PAKS Unity Road - ${phaseLabel} Donations Ledger`, 40, 40);
   doc.setFontSize(10);
   doc.text(`Generated ${today()}  |  ${donations.length} donations  |  Total Rs. ${fmt(total)}`, 40, 58);
 

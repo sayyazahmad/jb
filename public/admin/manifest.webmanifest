@@ -1,8 +1,8 @@
 {
   "id": "/admin/",
-  "name": "Awami Road Admin",
-  "short_name": "AR Admin",
-  "description": "Record and manage Awami Road donations.",
+  "name": "PAKS Unity Road Admin",
+  "short_name": "PAKS Admin",
+  "description": "Record and manage PAKS Unity Road donations.",
   "start_url": "/admin/",
   "scope": "/admin/",
   "display": "standalone",
